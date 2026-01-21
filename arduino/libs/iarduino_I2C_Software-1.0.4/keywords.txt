@@ -1,0 +1,26 @@
+#	####################################################
+#	СИНТАКСИЧЕСКАЯ РАСКРАСКА ДЛЯ БИБИЛИОТЕКИ:
+#	iarduino_I2C_Software
+#	####################################################
+#	ТИПЫ ДАННЫХ:							   (KEYWORD1)
+	iarduino_I2C_Software	KEYWORD1
+	SoftTwoWire	KEYWORD1
+#	####################################################
+#	МЕТОДЫ И ФУНКЦИИ:						   (KEYWORD2)
+	setPins	KEYWORD2
+	begin	KEYWORD2
+	end	KEYWORD2
+	setClock	KEYWORD2
+	setWireTimeout	KEYWORD2
+	getWireTimeoutFlag	KEYWORD2
+	clearWireTimeoutFlag	KEYWORD2
+	beginTransmission	KEYWORD2
+	endTransmission	KEYWORD2
+	requestFrom	KEYWORD2
+	write	KEYWORD2
+	available	KEYWORD2
+	read	KEYWORD2
+	peek	KEYWORD2
+	flush	KEYWORD2
+	onReceive	KEYWORD2
+	onRequest	KEYWORD2
