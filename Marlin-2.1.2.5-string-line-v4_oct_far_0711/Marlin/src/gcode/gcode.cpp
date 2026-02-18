@@ -1113,9 +1113,9 @@ void GcodeSuite::process_parsed_command(bool no_ok) {
       parser.unknown_command_warning();
   }
 
-  if (!no_ok) queue.ok_to_send();
+  //if (!no_ok) queue.ok_to_send();
 
-  SERIAL_IMPL.msgDone(); // Call the msgDone serial hook to signal command processing done
+  //SERIAL_IMPL.msgDone(); // Call the msgDone serial hook to signal command processing done
 }
 
 #if ENABLED(M100_FREE_MEMORY_DUMPER)

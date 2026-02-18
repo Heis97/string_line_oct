@@ -208,7 +208,7 @@ public:
   #else
     static void flush_rx() {}
   #endif
-
+ 
   /**
    * (Re)Set the current line number for the last received command
    */
@@ -253,7 +253,9 @@ public:
     }
 
   #endif // BUFFER_MONITORING
- static int get_serial_commands(char* line,byte len);
+
+   int last_N = 0;
+  int get_serial_commands(char* line,byte len);
 private:
  
   static void get_serial_commands();

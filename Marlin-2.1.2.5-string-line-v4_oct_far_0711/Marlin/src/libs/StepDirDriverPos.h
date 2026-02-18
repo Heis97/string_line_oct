@@ -29,6 +29,8 @@ class StepDirDriverPos {
       void  home_axis(byte num);
       void  home_handler(byte num);
       void  home_handler();
+      void  vel_handler(byte num);
+      void  vel_handler();
       void  gotopos(long int koord, byte num);
       void  gotopos(float dist, byte num);
       void  step(long int steps, byte num);  // инициирует поворот двигателя на заданное число шагов
@@ -37,6 +39,9 @@ class StepDirDriverPos {
       void  setPos(float dist, byte num); 
       void  setDivider(long int divider, byte num);  // установка делителя частоты для коммутации фаз
       void  setVel(float vel, byte num);
+      void  setVelIntern(float vel, byte num);
+      void  setVelDest(float vel, byte num);
+      void  setAcs(float acs, byte num);
       void  set_motor_dir(int dir, byte num);
       volatile long int* readSteps();  // чтение оставшихся шагов
       volatile long int* readPos();  // чтение координаты
@@ -52,6 +57,8 @@ class StepDirDriverPos {
       void sleep(byte num);
       void sleep_all();
       void sleep_string(byte motors_tens[5]);
+
+
 //DEFAULT_AXIS_STEPS_PER_UNIT
 
 #ifndef PPRIMARY_PLATE
@@ -65,8 +72,17 @@ class StepDirDriverPos {
       volatile long int _pos[AXIS_NUM]{}; 
         
      // boolean _fixStop[AXIS_NUM];  // признак фиксации положения при остановке
-      volatile  long  int  _divider[AXIS_NUM]{};  // делитель частоты для коммутации фаз
-      volatile long  int  _dividerCount[AXIS_NUM]{};  // счетчик делителя частоты для коммутации фаз
+      volatile  long  int  _divider[AXIS_NUM]{};  
+      volatile  long  int  _dividerCount[AXIS_NUM]{};  
+
+      unsigned long  _time_ch_vel;  
+      unsigned long  _time_ch_vel_prev[AXIS_NUM]{}; 
+
+      float  _vel_dest[AXIS_NUM]{};  
+      float  _vel_prev[AXIS_NUM]{}; 
+      float  _vel[AXIS_NUM]{};  
+      float  _acs[AXIS_NUM]{};  
+
       int _pinStep[AXIS_NUM]{};
       int  _pinDir[AXIS_NUM]{};
       int  _pinEn [AXIS_NUM]{};

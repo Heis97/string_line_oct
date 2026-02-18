@@ -426,10 +426,12 @@ uint8_t SoftSPIB::transfer_2(uint8_t data_out) {
     cli();
     // output pin high - like sending 0xFF
     //WRITE(ARD_MOSI_PIN, HIGH);
-
+//2 nop // 2 nop - lost bits every ~20 sends
     for (uint8_t i = 0; i < 8; ++i) {
       WRITE(ARD_SCK_PIN, LOW);
 
+      nop; // adjust so SCK is nice
+      nop;
       nop; // adjust so SCK is nice
       nop;
       WRITE(ARD_MOSI_PIN, data_out & 0x80);
@@ -438,6 +440,8 @@ uint8_t SoftSPIB::transfer_2(uint8_t data_out) {
       if (READ(ARD_MISO_PIN)) data |= 1;
 
       WRITE(ARD_SCK_PIN, HIGH);
+      nop; // adjust so SCK is nice
+      nop;
       nop; // adjust so SCK is nice
       nop;
 

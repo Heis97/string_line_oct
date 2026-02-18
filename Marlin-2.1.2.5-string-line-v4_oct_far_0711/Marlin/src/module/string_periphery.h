@@ -91,9 +91,13 @@ void set_hv_i(uint16_t v);
 //-----------------M578
 float get_v_press();
 void set_press(uint16_t v);
-void motors_free(int v);
+void motors_free(uint8_t v);
 
-void tare_tens(int v);
+void tare_tens();
+void tare_tens_handler();
+void tare_tens_handler_one(uint8_t v);
+void tare_tens_pull(uint8_t v);
+void tare_tens_release(uint8_t v);
 
 //-----------------M579
 
@@ -203,9 +207,9 @@ float kp_2 = 0.3;
 int cycle_time = 50;
 int period_manage_ms = 200;
 
-int gateway_move = 0;
-int recuperator_move = 0;
-int feed_pound_move = 0;
+volatile int gateway_move = 0;
+volatile int recuperator_move = 0;
+volatile int feed_pound_move = 0;
 
 int motors_free_state = 0;
 int tare_tens_state = 0;
@@ -214,7 +218,10 @@ float gateway_def_vel = 30.0f;
 float feed_pound_def_vel = 30.0f;
 float recuperator_def_vel = 90.0f;
 
-float vibro_vel = 150.0f;
+float taring_pull_vel = 0.3f;
+float taring_release_vel = 0.4f;
+
+float vibro_vel = 90.0f;
 
 int string_vibro = 0;
 int karet_move = 0;
@@ -282,6 +289,9 @@ float force_off[5] = {0,0,0,0,0};
 float force_k[5] ={1,1,1,1,1};
 
 long string_lenght[5] = {0,0,0,0,0};
+
+bool taring_process[TENSOMETR_NUM] = {false,false,false,false,false};
+bool taring_process_all = false;
 
 
 #ifndef PRIMARY_PLATE

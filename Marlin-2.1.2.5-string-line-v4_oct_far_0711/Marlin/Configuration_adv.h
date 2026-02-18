@@ -1,4 +1,4 @@
-/**
+/**Yflj Fu
  * Marlin 3D Printer Firmware
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
@@ -2783,7 +2783,11 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(Z)
-    #define Z_CURRENT       950
+    #ifndef PRIMARY_PLATE
+    #define Z_CURRENT       600        // (mA) RMS current. Multiply by 1.414 for peak current.
+      #else
+    #define Z_CURRENT       800  
+      #endif
     #define Z_CURRENT_HOME  Z_CURRENT
     #define Z_MICROSTEPS     16
     #define Z_RSENSE          0.11

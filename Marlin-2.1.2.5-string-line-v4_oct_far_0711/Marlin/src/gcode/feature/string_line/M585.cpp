@@ -29,22 +29,24 @@ void GcodeSuite::M585() {
    if (parser.seen('Y') && parser.seen('V'))  {motors._vibro[string_manager.gateway_axis] = parser.intval('V');}; 
   if (parser.seen('Y') && parser.seen('D'))  {motors.vibro_ampl[string_manager.gateway_axis] = parser.intval('D');};
 
-  if ( parser.seen('W'))  {string_manager.vibro_vel = parser.intval('W');};
+
  // if (parser.seen('X') && parser.seen('W'))  {string_manager.k_m[string_manager.feed_pound_axis]= parser.intval('W');};
 
 //----------------------------------------------------------------------
 
-  if (parser.seen('Y') && parser.seen('U'))  {string_manager.vibro_time = parser.intval('U');};
-  if (parser.seen('Y') && parser.seen('K'))  {string_manager.relax_time = parser.intval('K');};
-
- // if (parser.seen('Y') && parser.seen('S'))  {string_manager.s_y_def = parser.floatval('S');};
- // if (parser.seen('Y') && parser.seen('O'))  {string_manager.s_y_vibr = parser.floatval('O');};
 
   //-------------------Z-----------------------
   if (parser.seen('Z'))                      {string_manager.recuperator_move = parser.intval('Z');};
-  if (parser.seen('Z') && parser.seen('D'))  {string_manager.dir[string_manager.recuperator_axis] = parser.intval('D');};
+if (parser.seen('Z') && parser.seen('V'))  {motors.vibro_ampl[string_manager.recuperator_axis] = parser.intval('V');};
+if (parser.seen('Z') && parser.seen('D'))  {string_manager.dir[string_manager.recuperator_axis] = parser.intval('D');};
 
-
+//------------------------------------------------------------------------------------------
+  
+  if (parser.seen('Y') && parser.seen('U'))  {string_manager.vibro_time = parser.intval('U');};
+  if (parser.seen('Y') && parser.seen('K'))  {string_manager.relax_time = parser.intval('K');};
+  if ( parser.seen('W'))  {string_manager.vibro_vel = parser.intval('W');};
+ // if (parser.seen('Y') && parser.seen('S'))  {string_manager.s_y_def = parser.floatval('S');};
+ // if (parser.seen('Y') && parser.seen('O'))  {string_manager.s_y_vibr = parser.floatval('O');};
 //------------------turbo----------------------------------------------------------------------
   if (parser.seen('F')) 
   {

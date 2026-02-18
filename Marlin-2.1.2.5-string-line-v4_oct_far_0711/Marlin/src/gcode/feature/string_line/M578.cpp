@@ -29,7 +29,7 @@ void GcodeSuite::M578() {
 
   if (parser.seen('A')) 
   {
-    string_manager.tare_tens(parser.intval('A'));
+    //string_manager.tare_tens();
   } 
 
   

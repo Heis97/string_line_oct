@@ -564,7 +564,7 @@ inline bool process_line_done(uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind
  void GCodeQueue::get_serial_commands() {}
 //real orig
 
-int last_N = 0;
+
 int GCodeQueue::get_serial_commands(char* line,byte len) {
 
         int p = 0;
