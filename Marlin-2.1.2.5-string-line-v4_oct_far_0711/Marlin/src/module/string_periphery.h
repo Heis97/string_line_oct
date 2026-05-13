@@ -5,7 +5,7 @@
 //#include "../libs/Adafruit_MAX31865_sw.h"
 #include "../feature/twibus.h"
 #include "../libs/MAX6675.h"
-//#include "../libs/MAX31865.h"
+#include "../libs/MAX31865.h"
 //#include "../libs/AS5048A.h"
 //#include "../libs/AS5600.h" 
 #include "../libs/Adafruit_PCF8574.h"
@@ -25,12 +25,30 @@
 #include "../gcode/queue.h"
 
 
+#define PFLED_NET 1
+#define PFLED_TURBO 2
+#define PFLED_PNEVMO 9
+#define PFLED_RECUP 5
+#define PFLED_HEAT 6
+
+#define PFLED_STRING0 0
+#define PFLED_STRING1 3
+#define PFLED_STRING2 8
+#define PFLED_STRING3 4
+#define PFLED_STRING4 7
+
 #define VIBRO2_PIN  PA3// PA3
 
 
 
 #define LED_MC1_PIN FAN0_PIN
 #define LED_MC2_PIN FAN1_PIN
+
+#define FAN_PEREPH_PIN FAN4_PIN
+#define FAN_BOX_PIN FAN5_PIN
+
+#define TURBO_PIN HEATER_3_PIN
+#define PRESS_PIN HEATER_3_PIN
 
 #ifndef MAKET
 #define LED_POUND FAN2_PIN
@@ -64,10 +82,13 @@ Adafruit_PCF8574 pcf_led2;
 #define TENSOMETR_NUM 5
 #define MED_FILTR_LEN 3
 
+//#define INVERT_RELE
+
 MAX6675 max6675_temp_cam_ext = MAX6675(TEMP_0_CS_PIN ,ARD_MOSI_PIN,ARD_MISO_PIN,ARD_SCK_PIN);
 MAX6675 max6675_temp_cam_intern_1 = MAX6675(TEMP_1_CS_PIN ,ARD_MOSI_PIN,ARD_MISO_PIN,ARD_SCK_PIN);
 MAX6675 max6675_temp_cam_intern_2 = MAX6675(TEMP_2_CS_PIN ,ARD_MOSI_PIN,ARD_MISO_PIN,ARD_SCK_PIN);
-//MAX31865 max_test1 = MAX31865(TEMP_0_CS_PIN ,TEMP_0_MOSI_PIN,TEMP_0_MISO_PIN,TEMP_0_SCK_PIN);
+
+MAX31865 max_test1 = MAX31865(TEMP_0_MAX31865 ,TEMP_0_MOSI_PIN,TEMP_0_MISO_PIN,TEMP_0_SCK_PIN);
 
 
 void init();
@@ -124,7 +145,7 @@ void set_heaters_ind(int v);
 void set_heaters_temp(float v);
 
 void manage_heat();
-void manage_heat_duty();
+void manage_heat_duty(float temp);
 int manage_heat_duty_single(int ind, float temp, float kp);
 void heat_pwm_control();
 void heat_pwm_control_single(int ind, int counter,int duty);
@@ -134,6 +155,11 @@ void set_reporting(bool state);
 
 //M580----------------------------------- 
 
+void set_current_lenght_string(float dist);
+void set_dest_lenght_string(float dist);
+void move_pos_string(int val);
+void move_pos_string_handler();
+
 void manage_motion();
 
 //---------------------
@@ -141,7 +167,10 @@ int manage_axis_vibro(AxisEnum Axis, int vibr, int k, int k_m,int dir,int vibr_a
 int manage_axis_vibro_simple(AxisEnum Axis,int dir,  int vibr, int k, int k_m);
 void manage_axis(AxisEnum Axis, int dir);
 int get_request_i2c(int adr, char rec_i2c[]);
-void parse_data_ts(char _data[], float* force, long* string_len,float force_k, int start_ind);
+bool parse_data_ts(char _data[], float* force, long* string_len,float force_k, uint8_t start_ind);
+uint8_t crc8(const void* data, size_t length, uint8_t crc);
+uint16_t crc16(const uint8_t *data, size_t length);
+bool parse_data_ts_bin(char _data[], float* force, long* string_len,float force_k, uint8_t start_ind);
 int* divide_data_parse(char _data[],int inds[]);
 //M585---------------------------
 
@@ -150,7 +179,7 @@ void set_turbo(uint16_t v);
 
 //string----------------------------------
 void comp_speeds_string();
-float comp_one_tension(float koef_tens, float koef_v_tens, float force_cur, float force_dest,int en);
+double comp_one_tension(double koef_tens, double koef_v_tens, float force_cur, float force_dest,int en);
 
 
 //micros-------------M585----------------------------
@@ -196,16 +225,23 @@ long med_filtr(int row,long arr[TENSOMETR_NUM][MED_FILTR_LEN]);
 
 void set_vel_strings(float vel);
 void reset_vel_strings();
+
+
+
+void set_pfled(uint8_t numled,bool val);
+void handler_pfled();
+void refresh_pfled();
 //__________________________________
 
 
 int vibro_main = 0;
 
 
-float kp_1 = 0.3;
-float kp_2 = 0.3;
-int cycle_time = 50;
-int period_manage_ms = 200;
+long cur_line_num = 0;
+float kp_1 = 140;
+float kp_2 = 140;
+int cycle_time = 10000;
+int period_manage_mcs = 1000;
 
 volatile int gateway_move = 0;
 volatile int recuperator_move = 0;
@@ -214,20 +250,35 @@ volatile int feed_pound_move = 0;
 int motors_free_state = 0;
 int tare_tens_state = 0;
 
-float gateway_def_vel = 30.0f;
-float feed_pound_def_vel = 30.0f;
-float recuperator_def_vel = 90.0f;
+double r_tens = 39;//d
+volatile double k_enc_abs = 1.0d;
 
-float taring_pull_vel = 0.3f;
-float taring_release_vel = 0.4f;
+float cur_speed_sec_med = 0.0f;
 
-float vibro_vel = 90.0f;
+
+
+volatile float gateway_def_vel = 12.0f;
+volatile float feed_pound_def_vel = 10.0f;
+volatile float recuperator_def_vel = 12.0f;
+
+volatile float karet_def_vel = 4.0f;
+
+volatile float taring_pull_vel = 1.0f;
+volatile float taring_release_vel = 1.0f;
+
+volatile float vibro_vel = 1.0f;//9
+volatile float vibro_vel_valve = 80.0f;
+volatile float vibro_vel_prim = 80.0f;
+float vibro_ampl_valve = 40.0f;
+float vibro_ampl2_valve = 1.0f;
 
 int string_vibro = 0;
 int karet_move = 0;
 
 volatile int string_move = 0;
 volatile int string_move_second[5] = {0,0,0,0,0};
+
+volatile int string_state_second[5] = {0,0,0,0,0};
 
 int vibro_phase = 0;
 int vibro_time = 400.0;
@@ -241,7 +292,7 @@ int buff_m = 11;
 
 
 
-int  vibro_loop_high = 10000;
+int  vibro_loop_high = 2000;
 int  vibro_loop_ampl = 10;
 int  vibro_loop_ampl2 = 40;
 int vibro_loop_ampl_cur = 0;
@@ -268,14 +319,18 @@ byte feed_pound_axis = (byte)X_AXIS;
 byte gateway_axis = (byte)Y_AXIS;
 byte recuperator_axis = (byte)Z_AXIS;
 
+byte vibro_axis = (byte)E_AXIS;
+
 EthernetClient client;
 
+double koef_v_tens_one = 0.00001;
+double koef_tens[5] =      {1,1,1,1,1};
+double koef_v_tens[5] =      {koef_v_tens_one,koef_v_tens_one,koef_v_tens_one,koef_v_tens_one,koef_v_tens_one};
 
-float koef_tens[5] =      {1,1,1,1,1};
-float koef_v_tens[5] =      {0.000005,0.000005,0.000005,0.000005,0.000005};
-
+int string_direction = 1;
 float koef_gauss[5] =  {1,1,1,1,1};  
 
+float cur_speed_enc[5] =         {1,1,1,1,1};    
 float cur_speed_tens[5] =         {1,1,1,1,1};     float cur_speed_tens_com = 1;
 float orig_speed_tens[5] =         {1,1,1,1,1};     float orig_speed_tens_com = 1;
 
@@ -288,7 +343,10 @@ float force_dest[5] = {-30,-30,-30,-30,-30};
 float force_off[5] = {0,0,0,0,0};
 float force_k[5] ={1,1,1,1,1};
 
-long string_lenght[5] = {0,0,0,0,0};
+long string_lenght_cur[5] = {0,0,0,0,0};
+long string_lenght_int[5] = {0,0,0,0,0};
+long string_lenght_off[5] = {0,0,0,0,0};
+long string_lenght_dest[5] = {0,0,0,0,0};
 
 bool taring_process[TENSOMETR_NUM] = {false,false,false,false,false};
 bool taring_process_all = false;
@@ -300,6 +358,8 @@ bool taring_process_all = false;
 
 void set_led_micro_d(uint8_t v);
 void set_led_micro_e(uint8_t v);
+
+volatile float microsc_vel = 5.1f;
 
 
 AxisEnum mirror_axis_d = J_AXIS;
@@ -315,12 +375,12 @@ int homed_d = 0;
 
 float mirror_cur_d = 0;
 float camera_cur_d = 0;
-float offset_mirror_d = 10;//10 maket // 3
+float offset_mirror_d = 3;//10 maket // 3
 //float pos_mirror_d[3] = {1,2,3};
 //float pos_camera_d[3] = {1,2,3};
 
-float pos_mirror_d[3] = {8.1,12.3,15.8};
-float pos_camera_d[3] = {10.3,14.5,18};
+float pos_mirror_d[3] = {2,15,30};
+float pos_camera_d[3] = {-5,8,23};
 
 float limit_camera_d = 50;
 float limit_mirror_d = 50;
@@ -341,12 +401,12 @@ int  homed_e = 0;
 
 float mirror_cur_e = 0;
 float camera_cur_e = 0;
-float offset_mirror_e = 10;//10
+float offset_mirror_e = 3;//10
 //float pos_mirror_e[3] = {1,2,3};
 //float pos_camera_e[3] = {1,2,3};
 
-float pos_mirror_e[3] = {8.1,12.3,15.8};
-float pos_camera_e[3] = {10.3,14.5,18};
+float pos_mirror_e[3] = {2,15,30};
+float pos_camera_e[3] = {-5,8,23};
 
 float limit_camera_e = 50;
 float limit_mirror_e = 50;
@@ -369,7 +429,7 @@ float HV = 0;//
 float temp_dest = 0;
 int ind_sensor = 0;
 int heater_en = 0;
-float temp_hyst = 3;
+float temp_hyst = 15;
 bool reporting = true;
 
 bool heating_1,heating_2;

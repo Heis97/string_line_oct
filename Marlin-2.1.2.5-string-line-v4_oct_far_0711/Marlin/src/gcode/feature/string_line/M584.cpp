@@ -39,33 +39,45 @@ void GcodeSuite::M584() {
       if (parser.seen('F') )  string_manager.taring_process[4]  = parser.intval('F');
       string_manager.tare_tens();
     }
-      
-
+    
     else
     {
-      if (parser.seen('A'))  string_manager.string_move_second[0]  = parser.intval('A');
-      if (parser.seen('B'))  string_manager.string_move_second[1]  = parser.intval('B');
-      if (parser.seen('C'))  string_manager.string_move_second[2]  = parser.intval('C');
-      if (parser.seen('D'))  string_manager.string_move_second[3]  = parser.intval('D');
-      if (parser.seen('F'))  string_manager.string_move_second[4]  = parser.intval('F');
+      for(int i=0; i<5;i++)
+      {
+        string_manager.string_move_second[i]  = 0;
+        string_manager.string_state_second[i]  = 0;
+      }
+
+      if (parser.seen('A'))  {string_manager.string_state_second[0]  = parser.intval('A'); }
+      if (parser.seen('B'))  {string_manager.string_state_second[1]  = parser.intval('B'); }
+      if (parser.seen('C'))  {string_manager.string_state_second[2]  = parser.intval('C'); }
+      if (parser.seen('D'))  {string_manager.string_state_second[3]  = parser.intval('D'); }
+      if (parser.seen('F'))  {string_manager.string_state_second[4]  = parser.intval('F'); }
       //string main--------------------------------------
-
-
-      if (parser.seen('U'))  string_manager.string_move  = parser.intval('U');
-    // if (parser.seen('U') && parser.seen('V'))  string_manager.speed_koef  = parser.floatval('V');
-      if (parser.seen('U') && parser.seen('Z'))  string_manager.orig_speed_tens_com  = parser.floatval('W');
-      if (parser.seen('U') && parser.seen('W'))  string_manager.dir[string_manager.motor_com_axis]  = parser.intval('W');
-
-
-      if (parser.seen('U') && parser.seen('E'))  string_manager.set_vel_strings(parser.floatval('E'));
-      if (parser.seen('U') && parser.seen('O'))  string_manager.reset_vel_strings();
-
-    }
-
-  
-       
       
+      if (parser.seen('U')) 
+      {
+        string_manager.string_move  = parser.intval('U');   
 
+        int moving = 1;
+
+        if(string_manager.string_move==0) moving = 0;
+        if (parser.seen('A'))  {string_manager.string_move_second[0]  = moving * parser.intval('A'); string_manager.set_pfled(PFLED_STRING0,string_manager.string_move_second[0]);}
+        if (parser.seen('B'))  {string_manager.string_move_second[1]  = moving * parser.intval('B'); string_manager.set_pfled(PFLED_STRING1,string_manager.string_move_second[1]);}
+        if (parser.seen('C'))  {string_manager.string_move_second[2]  = moving * parser.intval('C'); string_manager.set_pfled(PFLED_STRING2,string_manager.string_move_second[2]);}
+        if (parser.seen('D'))  {string_manager.string_move_second[3]  = moving * parser.intval('D'); string_manager.set_pfled(PFLED_STRING3,string_manager.string_move_second[3]);}
+        if (parser.seen('F'))  {string_manager.string_move_second[4]  = moving * parser.intval('F'); string_manager.set_pfled(PFLED_STRING4,string_manager.string_move_second[4]);}          
+      }
+      
+      //if (parser.seen('U') && parser.seen('V'))  string_manager.speed_koef  = parser.floatval('V');
+      //if (parser.seen('U') && parser.seen('Z'))  string_manager.orig_speed_tens_com  = parser.floatval('W'); 
+      //if (parser.seen('U') && parser.seen('W'))  string_manager.dir[string_manager.motor_com_axis]  = parser.intval('W');
+
+      if (parser.seen('W') && parser.seen('E'))  string_manager.set_vel_strings(parser.floatval('E'));
+      if (parser.seen('O'))  string_manager.move_pos_string(parser.intval('O'));
+      if (parser.seen('W') && parser.seen('H'))  string_manager.set_dest_lenght_string(parser.floatval('H'));
+      if (parser.seen('W') && parser.seen('J'))  string_manager.set_current_lenght_string(parser.floatval('J'));
+    }
   }
   
   #endif

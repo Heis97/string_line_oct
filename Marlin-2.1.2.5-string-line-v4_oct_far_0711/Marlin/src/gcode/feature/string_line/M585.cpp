@@ -8,10 +8,6 @@
 
 void GcodeSuite::M585() {
 
-
-
-
-
   #ifndef PRIMARY_PLATE
   //BUNKER CONTROL
       //------------------X vibro-----------------------
@@ -36,15 +32,15 @@ void GcodeSuite::M585() {
 
 
   //-------------------Z-----------------------
-  if (parser.seen('Z'))                      {string_manager.recuperator_move = parser.intval('Z');};
-if (parser.seen('Z') && parser.seen('V'))  {motors.vibro_ampl[string_manager.recuperator_axis] = parser.intval('V');};
+  if (parser.seen('Z'))                      {string_manager.recuperator_move = parser.intval('Z'); motors.setVelDest(string_manager.recuperator_def_vel,string_manager.recuperator_axis);};
+if (parser.seen('Z') && parser.seen('V'))  {motors.vibro_ampl[string_manager.vibro_axis] = 10*  parser.intval('V');};
 if (parser.seen('Z') && parser.seen('D'))  {string_manager.dir[string_manager.recuperator_axis] = parser.intval('D');};
 
 //------------------------------------------------------------------------------------------
   
   if (parser.seen('Y') && parser.seen('U'))  {string_manager.vibro_time = parser.intval('U');};
   if (parser.seen('Y') && parser.seen('K'))  {string_manager.relax_time = parser.intval('K');};
-  if ( parser.seen('W'))  {string_manager.vibro_vel = parser.intval('W');};
+  if ( parser.seen('W'))  {string_manager.gateway_def_vel = parser.intval('W');};
  // if (parser.seen('Y') && parser.seen('S'))  {string_manager.s_y_def = parser.floatval('S');};
  // if (parser.seen('Y') && parser.seen('O'))  {string_manager.s_y_vibr = parser.floatval('O');};
 //------------------turbo----------------------------------------------------------------------
@@ -59,7 +55,7 @@ if (parser.seen('Z') && parser.seen('D'))  {string_manager.dir[string_manager.re
 if (parser.seen('A') && parser.seen('H'))  {string_manager.move_betw_string_d(parser.floatval('H'));} ;
 if (parser.seen('A') && parser.seen('V'))  {string_manager.move_depth_d(parser.floatval('V'));} ;
 if (parser.seen('A') && parser.seen('P'))  {string_manager.move_to_pos_d(parser.intval('P'));} ;
-if (parser.seen('A') && parser.seen('G'))  {string_manager.home_d(parser.intval('G'));} ;
+if (parser.seen('A') && parser.seen('G'))  {string_manager.home_d(1);} ;//parser.intval('G')
 
 if (parser.seen('A') && parser.seen('I') && parser.seen('S'))  string_manager.pos_camera_d[parser.intval('I')] = parser.floatval('S');
 if (parser.seen('A') && parser.seen('I') && parser.seen('L'))  string_manager.pos_mirror_d[parser.intval('I')] = parser.floatval('L');
@@ -71,7 +67,7 @@ if (parser.seen('A') && parser.seen('R'))  string_manager.set_led_micro_d(parser
 if (parser.seen('C') && parser.seen('H'))  {string_manager.move_betw_string_e(parser.floatval('H'));} ;
 if (parser.seen('C') && parser.seen('V'))  {string_manager.move_depth_e(parser.floatval('V'));} ;
 if (parser.seen('C') && parser.seen('P'))  {string_manager.move_to_pos_e(parser.intval('P'));} ;
-if (parser.seen('C') && parser.seen('G'))  {string_manager.home_e(parser.intval('G'));} ;
+if (parser.seen('C') && parser.seen('G'))  {string_manager.home_e(1);} ;//parser.intval('G')
 
 if (parser.seen('C') && parser.seen('I') && parser.seen('S'))  string_manager.pos_camera_e[parser.intval('I')] = parser.floatval('S');
 if (parser.seen('C') && parser.seen('I') && parser.seen('L'))  string_manager.pos_mirror_e[parser.intval('I')] = parser.floatval('L');

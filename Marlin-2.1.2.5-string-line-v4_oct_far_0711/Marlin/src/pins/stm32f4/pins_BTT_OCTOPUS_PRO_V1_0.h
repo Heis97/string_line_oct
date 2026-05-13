@@ -28,12 +28,14 @@
 //
 #define TEMP_0_PIN                          PF4   // TH0
 
+#define TEMP_0_MAX31865                          PF8   // TH0
+
 #define TEMP_0_CS_PIN                     PB1   // Max31865 CS//   PF8 internal
 #define TEMP_1_CS_PIN                     PB2   // Max31865 CS//   PF8 internal
 #define TEMP_2_CS_PIN                     PC15   // Max31865 CS//   PF8 internal
-#define TEMP_0_SCK_PIN                    -1
-#define TEMP_0_MISO_PIN                   -1
-#define TEMP_0_MOSI_PIN                   -1
+#define TEMP_0_SCK_PIN                    PA5
+#define TEMP_0_MISO_PIN                   PA6
+#define TEMP_0_MOSI_PIN                   PA7
 //#define SOFTWARE_SPI                            // Max31865 and LCD SD share a set of SPIs, Set SD to softwareSPI for Max31865
 //#define FORCE_SOFT_SPI
 

@@ -184,6 +184,7 @@
 //#define MAX31865_MIN_SAMPLING_TIME_MSEC     100 // (ms) 1-shot: minimum read interval. Reduces bias voltage effects by leaving sensor unpowered for longer intervals.
 //#define MAX31865_IGNORE_INITIAL_FAULTY_READS 10 // Ignore some read faults (keeping the temperature reading) to work around a possible issue (#23439).
 
+
 //#define MAX31865_WIRE_OHMS_0              0.95f // For 2-wire, set the wire resistances for more accurate readings.
 //#define MAX31865_WIRE_OHMS_1              0.0f
 //#define MAX31865_WIRE_OHMS_2              0.0f
@@ -2760,7 +2761,7 @@
 
   #if AXIS_IS_TMC_CONFIG(Y)
       #ifndef PRIMARY_PLATE
-    #define Y_CURRENT       500        // (mA) RMS current. Multiply by 1.414 for peak current.
+    #define Y_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.
     #else
  #define Y_CURRENT       800  
     #endif
@@ -2887,11 +2888,11 @@
   #endif
 
   #if AXIS_IS_TMC_CONFIG(E0)
-    #define E0_CURRENT      800
+    #define E0_CURRENT      600
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
-    //#define E0_INTERPOLATE true
+    #define E0_INTERPOLATE false
     //#define E0_HOLD_MULTIPLIER 0.5
   #endif
 
@@ -3116,6 +3117,8 @@
    * M122 - Report driver parameters (Requires TMC_DEBUG)
    */
   //#define MONITOR_DRIVER_STATUS
+
+    //#define TMC_DEBUG
 
   #if ENABLED(MONITOR_DRIVER_STATUS)
     #define CURRENT_STEP_DOWN     50  // [mA]

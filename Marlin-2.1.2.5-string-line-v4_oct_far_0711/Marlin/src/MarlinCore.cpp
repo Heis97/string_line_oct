@@ -1587,9 +1587,12 @@ void setup() {
 
   SETUP_LOG("setup() completed.");
 
-  TERN_(MARLIN_TEST_BUILD, runStartupTests());
+  //gcode.M122();
 
+  TERN_(MARLIN_TEST_BUILD, runStartupTests());
+  reset_stepper_drivers();
   motors.wake_up_all();
+  
 }
 
 

@@ -8,7 +8,9 @@ void GcodeSuite::M580() {
 
 #ifdef PRIMARY_PLATE
 //-------------------Z-----------------------
- if (parser.seen('Z'))                      string_manager.karet_move = parser.intval('Z');
- if (parser.seen('Z') && parser.seen('D'))  string_manager.dir[string_manager.karet_axis] = parser.intval('D');
+ if (parser.seen('Z'))                      {string_manager.karet_move = parser.intval('Z')  ; motors.setVelDest(string_manager.karet_def_vel,string_manager.karet_axis) ; }
+ if (parser.seen('Z') && parser.seen('D'))  {string_manager.dir[string_manager.karet_axis] = parser.intval('D');motors.setVelDest(string_manager.karet_def_vel,string_manager.karet_axis) ;}
+
+ 
  #endif
 }

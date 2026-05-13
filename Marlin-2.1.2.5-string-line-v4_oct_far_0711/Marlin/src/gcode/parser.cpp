@@ -127,6 +127,7 @@ void GCodeParser::parse(char *p) {
     p += 2;                  // skip N[-0-9]
     while (NUMERIC(*p)) ++p; // skip [0-9]*
     while (*p == ' ')   ++p; // skip [ ]*
+    
   }
 
   // *p now points to the current command, which should be G, M, or T
@@ -170,6 +171,8 @@ void GCodeParser::parse(char *p) {
 
 
     default: return;
+
+
   }
 
   // The command parameters (if any) start here, for sure!
@@ -233,6 +236,137 @@ void GCodeParser::parse(char *p) {
   }
 }
 
+long GCodeParser::parse_s(char *p) {
+
+  reset(); // No codes to report
+  long com_num = 0 ;
+  auto uppercase = [](char c) {
+    return TERN0(GCODE_CASE_INSENSITIVE, WITHIN(c, 'a', 'z')) ? c + 'A' - 'a' : c;
+  };
+
+  // Skip spaces
+  while (*p == ' ') ++p;
+  // Skip N[-0-9] if included in the command line
+  if (uppercase(*p++) == 'N') {
+    //TERN_(FASTER_GCODE_PARSER, set('N', p + 1)); // (optional) Set the 'N' parameter value
+   // p += 2;                  // skip N[-0-9]
+   //++p;
+    do { com_num = com_num* 10 + *p++ - '0'; } while (NUMERIC(*p));
+       Serial.println("2");
+    while (*p == ' ')   ++p; // skip [ ]*
+       Serial.println("3");
+    
+  }
+
+  // *p now points to the current command, which should be G, M, or T
+  command_ptr = p;
+
+  // Get the command letter, which must be G, M, or T
+  const char letter = uppercase(*p++);
+
+  // Nullify asterisk and trailing whitespace
+  char *starpos = strchr(p, '*');
+  if (starpos) {
+    --starpos;                          // *
+    while (*starpos == ' ') --starpos;  // spaces...
+    starpos[1] = '\0';
+  }
+
+
+
+  /**
+   * Screen for good command letters. G, M, and T are always accepted.
+   * With Motion Modes enabled any axis letter can come first.
+   */
+  switch (letter) {
+    case 'M': 
+      // Skip spaces to get the numeric part
+      while (*p == ' ') p++;
+      // Save the command letter at this point
+      // A '?' signifies an unknown command
+      command_letter = letter;
+      // Get the code number - integer digits only
+      codenum = 0;
+
+      do { codenum = codenum * 10 + *p++ - '0'; } while (NUMERIC(*p));
+
+      // Skip all spaces to get to the first argument, or nul
+      while (*p == ' ') p++;
+
+      break;
+
+ 
+    default: 
+      return com_num; 
+    break;
+
+    
+    
+  }
+
+  // The command parameters (if any) start here, for sure!
+
+  IF_DISABLED(FASTER_GCODE_PARSER, command_args = p); // Scan for parameters in seen()
+
+
+  string_arg = nullptr;
+  while (const char param = uppercase(*p++)) {  // Get the next parameter. A NUL ends the loop
+
+    #if ENABLED(FASTER_GCODE_PARSER)
+      // Arguments MUST be uppercase for fast G-Code parsing
+      #define PARAM_OK(P) WITHIN((P), 'A', 'Z')
+    #else
+      #define PARAM_OK(P) true
+    #endif
+
+    if (PARAM_OK(param)) {
+
+      while (*p == ' ') p++;                    // Skip spaces between parameters & values
+
+      #if ENABLED(GCODE_QUOTED_STRINGS)
+        const bool is_str = (*p == '"'), has_val = is_str || valid_float(p);
+        char * const valptr = has_val ? is_str ? unescape_string(p) : p : nullptr;
+      #else
+        const bool has_val = valid_float(p);
+        #if ENABLED(FASTER_GCODE_PARSER)
+          char * const valptr = has_val ? p : nullptr;
+        #endif
+      #endif
+
+      //#if ENABLED(DEBUG_GCODE_PARSER)
+       // if (debug) {
+         // SERIAL_ECHOPGM("Got param ", C(param), " at index ", p - command_ptr - 1);
+          //if (has_val) SERIAL_ECHOPGM(" (has_val)");
+       // }
+      //#endif
+
+      if (!has_val && !string_arg) {            // No value? First time, keep as string_arg
+        string_arg = p - 1;
+        #if ENABLED(DEBUG_GCODE_PARSER)
+          if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+        #endif
+      }
+
+      if (TERN0(DEBUG_GCODE_PARSER, debug)) SERIAL_EOL();
+
+      TERN_(FASTER_GCODE_PARSER, set(param, valptr)); // Set parameter exists and pointer (nullptr for no value)
+    }
+    else if (!string_arg) {                     // Not A-Z? First time, keep as the string_arg
+      string_arg = p - 1;
+      #if ENABLED(DEBUG_GCODE_PARSER)
+        if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+      #endif
+    }
+
+    if (!WITHIN(*p, 'A', 'Z')) {                // Another parameter right away?
+      while (*p && DECIMAL_SIGNED(*p)) p++;     // Skip over the value section of a parameter
+      while (*p == ' ') p++;                    // Skip over all spaces
+    }
+  }
+  
+return com_num;
+ 
+}
 
 void GCodeParser::unknown_command_warning() {
   SERIAL_ECHO_MSG(STR_UNKNOWN_COMMAND, command_ptr, "\"");

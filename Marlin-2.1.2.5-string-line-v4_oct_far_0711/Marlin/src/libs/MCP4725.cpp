@@ -36,7 +36,7 @@ bool MCP4725::begin()
 
   _lastValue = readDAC();
   _powerDownMode = readPowerDownModeDAC();
-  _wire->setClock(400000);
+  _wire->setClock(100000);
   return true;
 }
 

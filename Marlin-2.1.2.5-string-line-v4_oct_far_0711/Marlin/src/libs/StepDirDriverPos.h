@@ -38,18 +38,22 @@ class StepDirDriverPos {
       void  setPos(long int pos, byte num); 
       void  setPos(float dist, byte num); 
       void  setDivider(long int divider, byte num);  // установка делителя частоты для коммутации фаз
+      void  set_cur_k(float k, byte num);
       void  setVel(float vel, byte num);
-      void  setVelIntern(float vel, byte num);
-      void  setVelDest(float vel, byte num);
+      void  setDiv(float div, byte num);
+      void  setVelIntern(volatile float vel, byte num);
+      void setVelDest(volatile float vel, byte num);
       void  setAcs(float acs, byte num);
       void  set_motor_dir(int dir, byte num);
-      volatile long int* readSteps();  // чтение оставшихся шагов
-      volatile long int* readPos();  // чтение координаты
+      volatile long int* readSteps();
+      volatile long int* readPos();
+      volatile long readPosOne(byte num);
       volatile bool* readHoming();
       volatile bool readHoming_one(byte ax);
       long int dist_to_steps(float dist, byte num);
       byte readEnd(byte num);
-
+      float readVelDest(byte num);
+      float readVel(byte num);
       void idle();
 
       void wake_up(byte num);
@@ -66,22 +70,31 @@ class StepDirDriverPos {
       volatile int vibro_ampl[AXIS_NUM] { };
       volatile int vibro_counter[AXIS_NUM] {};
       volatile int cur_dir[AXIS_NUM] {};
+      
       #endif
+
+
+        
     private:
       volatile long int _steps[AXIS_NUM]{};// оставшееся число шагов 
       volatile long int _pos[AXIS_NUM]{}; 
         
      // boolean _fixStop[AXIS_NUM];  // признак фиксации положения при остановке
-      volatile  long  int  _divider[AXIS_NUM]{};  
+      
       volatile  long  int  _dividerCount[AXIS_NUM]{};  
+      volatile  int  _dividerCount_sub[AXIS_NUM]{};  
 
       unsigned long  _time_ch_vel;  
       unsigned long  _time_ch_vel_prev[AXIS_NUM]{}; 
 
-      float  _vel_dest[AXIS_NUM]{};  
-      float  _vel_prev[AXIS_NUM]{}; 
-      float  _vel[AXIS_NUM]{};  
-      float  _acs[AXIS_NUM]{};  
+      
+      volatile  long  int  _divider[AXIS_NUM]{};  
+      volatile  int  _divider_sub[AXIS_NUM]{}; 
+      volatile float  _vel[AXIS_NUM]{};  
+      volatile float  _vel_dest[AXIS_NUM]{};
+      volatile float  _vel_prev[AXIS_NUM]{}; 
+      
+      volatile float  _acs[AXIS_NUM]{};  
 
       int _pinStep[AXIS_NUM]{};
       int  _pinDir[AXIS_NUM]{};

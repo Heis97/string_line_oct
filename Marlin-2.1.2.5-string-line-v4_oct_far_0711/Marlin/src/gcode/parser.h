@@ -237,6 +237,8 @@ public:
   // This uses 54 bytes of SRAM to speed up seen/value
   static void parse(char * p);
 
+    static long parse_s(char * p);
+
   #if ENABLED(CNC_COORDINATE_SYSTEMS)
     // Parse the next parameter as a new command
     static bool chain();

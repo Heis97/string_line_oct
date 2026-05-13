@@ -613,6 +613,7 @@ enum StealthIndex : uint8_t {
         HW_SERIAL_BEGIN(E0);
       #else
         stepperE0.beginSerial(TMC_E0_BAUD_RATE);
+        //stepperE0.set_stealthChop(false);
       #endif
     #endif
     #if AXIS_HAS_UART(E1)
@@ -726,13 +727,17 @@ enum StealthIndex : uint8_t {
     chopconf.intpol = interpolate;
     chopconf.hend = chop_init.hend + 3;
     chopconf.hstrt = chop_init.hstrt - 1;
+    //chopconf.mres = 1;
+
     TERN_(SQUARE_WAVE_STEPPING, chopconf.dedge = true);
     st.CHOPCONF(chopconf.sr);
 
     st.rms_current(mA, hold_multiplier);
+    //st.microsteps(1);
     st.microsteps(microsteps);
     st.iholddelay(10);
     st.TPOWERDOWN(128); // ~2s until driver lowers to hold current
+    //Serial.println("tmc init");
 
     TMC2208_n::PWMCONF_t pwmconf{0};
     pwmconf.pwm_lim = 12;

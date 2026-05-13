@@ -10,7 +10,7 @@ void GcodeSuite::M576() {
   } 
   if (parser.seen('S')) 
   {
-    string_manager.string_lenght[0] = 0;
+    string_manager.string_lenght_cur[0] = 0;
   } 
   if (parser.seen('P')) 
   {

@@ -45,6 +45,7 @@ void GcodeSuite::M579() {
   if (parser.seen('E')) 
   {
     string_manager.set_heaters_enable(parser.floatval('E'));
+    
   }
 
   if (parser.seen('N')) 
@@ -65,7 +66,7 @@ void GcodeSuite::M579() {
   if (parser.seen('L')) 
   {
       float time_s = parser.floatval('L');
-      string_manager.cycle_time = (int)((1000*time_s) / (float)string_manager.period_manage_ms);
+   //   string_manager.cycle_time = (int)((1000000*time_s) / (float)string_manager.period_manage_mcs);
   }
   #endif
 }
