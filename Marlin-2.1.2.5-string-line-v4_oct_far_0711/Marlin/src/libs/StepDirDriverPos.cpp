@@ -14,12 +14,16 @@ int stop_pins[AXIS_NUM] {X_DIAG_PIN,  Y_DIAG_PIN,  Z_DIAG_PIN,  I_DIAG_PIN,  J_D
 
 #ifdef MAKET
 #ifdef PRIMARY_PLATE
+#define K_SET 0.63
 int motor_dir[AXIS_NUM] {-1,  -1,  -1,  -1,  -1,  -1,  -1,  -1  };
-int steps_pr_mm[AXIS_NUM] { 800, 80, 120,120, 120, 120, 60, 100 }; //speed x1.5 string//speed not right ~20%
+float steps_pr_mm_orig[AXIS_NUM] { 800, 80*K_SET, 120*K_SET,120*K_SET, 120*K_SET, 120*K_SET, 60*K_SET, 100 }; //speed x1.5 string//speed not right ~20%
+float steps_pr_mm[AXIS_NUM] { 800,80*K_SET, 120*K_SET,120*K_SET, 120*K_SET, 120*K_SET, 60*K_SET, 100}; //speed x1.5 string//speed not right ~20%
+float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 #else
 int motor_dir[AXIS_NUM] {1,  1,  -1,  -1,  1,  -1,  -1,  1  };
-int steps_pr_mm[AXIS_NUM] {  800, 800, 800,400, 400, 1600, 800, 50 };
-
+float  steps_pr_mm_orig[AXIS_NUM] {  800, 800, 800,400, 400, 1600, 800, 50 };
+float  steps_pr_mm[AXIS_NUM] {  800, 800, 800,400, 400, 1600, 800, 50 };
+float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 #endif
 
 #else
@@ -86,8 +90,19 @@ StepDirDriverPos::StepDirDriverPos (int* pinStep, int* pinDir, int* pinEn, int* 
     do_step[i] = false;
     _homing_need[i] = false;
 
+    #ifndef PRIMARY_PLATE 
+    setVelDest(2.1,i);
+    setAcs(0.5f,i);
+    if(i>3)
+    {
+       setVelDest(2.1,i);
+       setAcs(0.5f,i);
+    }
+    #else
     setVelDest(2.1,i);
     setAcs(10.0f,i);
+    #endif
+   
     _vel_prev[i] = 0;
       vibro_ampl[i] = 15;
     

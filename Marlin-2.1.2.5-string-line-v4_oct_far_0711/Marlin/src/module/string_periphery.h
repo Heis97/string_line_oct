@@ -48,7 +48,7 @@
 #define FAN_BOX_PIN FAN5_PIN
 
 #define TURBO_PIN HEATER_3_PIN
-#define PRESS_PIN HEATER_3_PIN
+#define PRESS_PIN RELAY_3_PIN
 
 #ifndef MAKET
 #define LED_POUND FAN2_PIN
@@ -113,6 +113,8 @@ void set_hv_i(uint16_t v);
 float get_v_press();
 void set_press(uint16_t v);
 void motors_free(uint8_t v);
+
+
 
 void tare_tens();
 void tare_tens_handler();
@@ -184,6 +186,7 @@ double comp_one_tension(double koef_tens, double koef_v_tens, float force_cur, f
 
 //micros-------------M585----------------------------
 
+void motors_free_bunker(uint8_t v);
 
 void move_depth_d(float dist);
 void move_betw_string_d(float dist);
@@ -238,8 +241,13 @@ int vibro_main = 0;
 
 
 long cur_line_num = 0;
-float kp_1 = 140;
-float kp_2 = 140;
+#ifdef MAKET
+float kp_1 = 40;//
+float kp_2 = 40;//
+#else
+float kp_1 = 140;//
+float kp_2 = 140;//
+#endif
 int cycle_time = 10000;
 int period_manage_mcs = 1000;
 
@@ -250,6 +258,8 @@ volatile int feed_pound_move = 0;
 int motors_free_state = 0;
 int tare_tens_state = 0;
 
+int sec_remain = 0;
+
 double r_tens = 39;//d
 volatile double k_enc_abs = 1.0d;
 
@@ -257,7 +267,7 @@ float cur_speed_sec_med = 0.0f;
 
 
 
-volatile float gateway_def_vel = 12.0f;
+volatile float gateway_def_vel = 3.0f;
 volatile float feed_pound_def_vel = 10.0f;
 volatile float recuperator_def_vel = 12.0f;
 
@@ -266,7 +276,7 @@ volatile float karet_def_vel = 4.0f;
 volatile float taring_pull_vel = 1.0f;
 volatile float taring_release_vel = 1.0f;
 
-volatile float vibro_vel = 1.0f;//9
+volatile float vibro_vel = 10.0f;//9
 volatile float vibro_vel_valve = 80.0f;
 volatile float vibro_vel_prim = 80.0f;
 float vibro_ampl_valve = 40.0f;
@@ -292,9 +302,9 @@ int buff_m = 11;
 
 
 
-int  vibro_loop_high = 2000;
-int  vibro_loop_ampl = 10;
-int  vibro_loop_ampl2 = 40;
+int vibro_loop_high = 2000;
+int vibro_loop_ampl = 250;
+int vibro_loop_ampl2 = 250;
 int vibro_loop_ampl_cur = 0;
 
 
@@ -379,8 +389,8 @@ float offset_mirror_d = 3;//10 maket // 3
 //float pos_mirror_d[3] = {1,2,3};
 //float pos_camera_d[3] = {1,2,3};
 
-float pos_mirror_d[3] = {2,15,30};
-float pos_camera_d[3] = {-5,8,23};
+float pos_mirror_d[5] = {2,7,15,22,30};
+float pos_camera_d[5] = {-5,2,8,16,23};
 
 float limit_camera_d = 50;
 float limit_mirror_d = 50;
@@ -405,8 +415,8 @@ float offset_mirror_e = 3;//10
 //float pos_mirror_e[3] = {1,2,3};
 //float pos_camera_e[3] = {1,2,3};
 
-float pos_mirror_e[3] = {2,15,30};
-float pos_camera_e[3] = {-5,8,23};
+float pos_mirror_e[5] = {2,7,15,22,30};
+float pos_camera_e[5] = {-5,2,8,16,23};
 
 float limit_camera_e = 50;
 float limit_mirror_e = 50;

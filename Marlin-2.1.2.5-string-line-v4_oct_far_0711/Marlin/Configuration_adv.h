@@ -2785,7 +2785,7 @@
 
   #if AXIS_IS_TMC_CONFIG(Z)
     #ifndef PRIMARY_PLATE
-    #define Z_CURRENT       600        // (mA) RMS current. Multiply by 1.414 for peak current.
+    #define Z_CURRENT       1000        // (mA) RMS current. Multiply by 1.414 for peak current.
       #else
     #define Z_CURRENT       800  
       #endif

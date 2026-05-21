@@ -36,7 +36,7 @@ uint16_t remote_port = 50001;
 #endif
 
 
-
+long bunk_vibro_time_counter = 0;
 
 
 EthernetServer server(localPort );
@@ -326,7 +326,7 @@ void StringPeriphery::string_spi_loop()
             //cur_speed_enc[i] =3.1415*32* 1000000*(dstr/((float)(4096*dtime)));//  imp/sec
             if(abs(dstr)<2) dstr = 0;
             float speed_real = (float)(1000000l*dstr)/((float)(dtime));
-            float enc_koef = 3.1415f*39.0f/4096.0f;
+            float enc_koef = 3.1415f*r_tens/4096.0f;
             cur_speed_enc[i] = cur_speed_enc[i] - 0.05* (cur_speed_enc[i] - enc_koef*speed_real);//  imp/sec
             if(string_move_second[i])
             {
@@ -389,6 +389,7 @@ void StringPeriphery::move_pos_string(int val)
 {   
     if(val == 0)
     {
+        dest_riched = 0;
         string_move = 0;
         for(int i=0; i< TENSOMETR_NUM;  i++)
         {
@@ -400,13 +401,13 @@ void StringPeriphery::move_pos_string(int val)
         k_enc_abs = 1.0d;
         if(string_state_second[i])
         {
-            dest_riched = SIGN(string_lenght_dest_one-string_lenght_cur[i]);
+            dest_riched = (int)SIGN(string_lenght_dest_one-string_lenght_cur[i]);
             if(dest_riched>0)
             {
                 string_move_second[i] = 1;
                 string_move = 1;
             }
-            else
+            else if (dest_riched<0)
             {
                 string_move_second[i] = 2;
                 string_move = 2;
@@ -414,24 +415,32 @@ void StringPeriphery::move_pos_string(int val)
         }
     }
 };
+
 void StringPeriphery::move_pos_string_handler()
 {
-    if(dest_riched==0) return;
+    if(dest_riched==0){sec_remain = 0; return;}
     //int dest_riched_check = 0;
     for(int i=0; i< TENSOMETR_NUM;  i++)
     {
-        if(string_state_second[i])
+        if(string_state_second[i] && string_move_second[i]!=0)
         {
-            int dest_riched_cur = SIGN(string_lenght_dest_one-string_lenght_cur[i]);
+            float cur_speed = 4096*orig_speed_tens_com /(r_tens*3.1415);//cur_speed_enc[i]
+            long len_remain = string_lenght_dest_one-string_lenght_cur[i];
+            sec_remain = (int)abs(len_remain/cur_speed);
+
+            int dest_riched_cur = (int)SIGN(len_remain);
+            
             //dest_riched_check = dest_riched_cur;
             if(dest_riched_cur!=dest_riched)
             {
                 dest_riched = 0;
                 string_move_second[i] = 0;
                 string_move = 0;
+                sec_remain = 0;
             }
         }
     }
+    //bunk_vibro_time_counter++;
     if(dest_riched==0)
     {
         for(int i=0; i< TENSOMETR_NUM;  i++)
@@ -440,6 +449,7 @@ void StringPeriphery::move_pos_string_handler()
             {
                 string_move_second[i] = 0;
                 string_move = 0;
+                sec_remain = 0;
             }
         }
     }
@@ -841,11 +851,18 @@ int pfled__refr_counter = 0;
 int pfled__refr_max = 500;
 void StringPeriphery::set_pfled(uint8_t numled,bool val)
 {
+    #ifdef MAKET
+     return;
+     #else
    pfled_state[numled] = val;
+   #endif
 };
 
 void StringPeriphery::handler_pfled()
 {
+    #ifdef MAKET
+     return;
+     #else
     for(uint8_t numpf =0; numpf<10;numpf++)
     {
         if(pfled_state[numpf]!=pfled_state_cur[numpf])
@@ -868,11 +885,14 @@ void StringPeriphery::handler_pfled()
         refresh_pfled();
         pfled__refr_counter = 0;
     }
-    
+    #endif
 };
 
 void StringPeriphery::refresh_pfled()
 {
+    #ifdef MAKET
+     return;
+     #else
     for(uint8_t numpf =0; numpf<10;numpf++)
     {
         if(numpf<8)
@@ -884,6 +904,7 @@ void StringPeriphery::refresh_pfled()
             pcf_led2.digitalWrite(numpf-8,pfled_state_cur[numpf]);
         }
     }
+    #endif
 };
 //----------------------------------------------------
 bool swap = false;
@@ -916,11 +937,11 @@ int count_vibro_wr = 0;
 #ifdef PRIMARY_PLATE
 bool bunk_vibro = 0;
 #else
-bool bunk_vibro = 0;
+bool bunk_vibro = 1;
 #endif
 unsigned long bunk_vibro_time_relax = 4000;
 unsigned long bunk_vibro_time_work =  1000;
-long bunk_vibro_time_counter = 0;
+
 
 bool vibro_set = false;
 bool unvibro_set = false;
@@ -1024,15 +1045,8 @@ void StringPeriphery::idle()
     if(dt_temp>period_manage_mcs  )
     {
        //-----------------------------------
-        //pressure = get_v_press();//20ms delay
-        
+        //pressure = get_v_press();//20ms delay       
         //HV = get_v_hv();// mcp4725_hv_v.getValue();
-        /*max6675_temp_cam_ext.read(); 
-        max6675_temp_cam_intern_1.read(); 
-        max6675_temp_cam_intern_2.read(); 
-        temp_val_int1 = max6675_temp_cam_intern_1.getTemperature();
-        temp_val_int2 = max6675_temp_cam_intern_2.getTemperature();*/
-        //temp_val_ext = max6675_temp_cam_ext.getTemperature();
         temp_cycle_counter++;
         if(temp_cycle_counter>temp_cycle_max)
         {
@@ -1049,14 +1063,9 @@ void StringPeriphery::idle()
         //pcf_led1.digitalWrite(0,true);
     }
 
-    
-    
 
     unsigned long dt_start_led =  (cur_time - time_measure_start_led);
     //unsigned long dt_stop_led =  (cur_time - time_measure_stop_led);
-
-
-
 
     #endif
 
@@ -1143,13 +1152,7 @@ void StringPeriphery::idle()
             
 
             #else
-
-
-            //manage_motion();
-            //motors.setAcs(10,karet_axis);
-            
             motors.setVelDest(karet_def_vel,karet_axis);
-          //motors.setVelDest(karet_def_vel,karet_axis);
             #endif
           unvibro_set = true;
         }
@@ -1500,7 +1503,6 @@ void  StringPeriphery::reset_vel_strings()
 
     for(int i=0; i<TENSOMETR_NUM; i++)
     {
-
         koef_tens[i] = 1;
     }
     //orig_speed_tens_com = vel;
@@ -1539,17 +1541,27 @@ void StringPeriphery::set_press(uint16_t v)
 
 void StringPeriphery::set_turbo(uint16_t v)
 {
+ #ifndef PRIMARY_PLATE
 mcp4725_turbo.setValue(v);
+ #endif
 turbo_val_cur = v;
 if(v>20)
 {
-    set_pfled(PFLED_TURBO,true);
+    
+    #ifndef PRIMARY_PLATE
     WRITE(TURBO_PIN,1);
+    #else
+    set_pfled(PFLED_TURBO,true);
+    #endif
 }
 else
 {
-    set_pfled(PFLED_TURBO,false);
+    
+    #ifndef PRIMARY_PLATE
     WRITE(TURBO_PIN,0);
+    #else
+    set_pfled(PFLED_TURBO,false);
+    #endif
 }
 //Serial.println(turbo_val_cur);
 
@@ -1678,8 +1690,8 @@ String StringPeriphery::state_cur()
         state = "st1 "+
         String(cur_line_num)+ delim+//0
         String(cur_send)+ delim+//1
-        String(temp_val_ext)+delim+//2
-        String(heater_en)+delim+//3  heater_en
+        String(temp_val_ext)+delim+//2  temp_val_ext
+        String(sec_remain)+delim+//3  heater_en
         String(vibro_main)+delim+//4 
         String(release_counter[0])+delim+//5
         String(reley_HV)+delim;//6
@@ -1715,9 +1727,9 @@ String StringPeriphery::state_cur()
         String(cur_line_num)+ delim+//0
         String(cur_send)+ delim+//1
         String(vel_count_2)+delim+//2 //
-        String((int)(delta_cur_max*10.0f))+delim+//3 //
-        String((int)(k_enc_abs*10000))+delim+//4 //
-        "0"+delim+//5 //
+        String((int)(integr_part*10000.0f))+delim+//3 //
+        String((int)(duty_1))+delim+//4 //
+        String((int)(sec_remain))+delim+//5 //sec_remain
         "0"+delim;//6 //
 
 
@@ -1896,7 +1908,24 @@ void StringPeriphery::motors_free(uint8_t v)
     motors_free_state = v;
 };
 
-
+void StringPeriphery::motors_free_bunker(uint8_t v)
+{
+    if (v==0)
+    {
+        for(int i=0; i< 3; i++)
+        {
+            motors.wake_up((byte)i);            
+        }
+    }
+    else
+    {
+        for(int i=0; i< 3; i++)
+        {
+            motors.sleep((byte)i);
+        }
+    }
+    //motors_free_state = v;
+};
 
 void StringPeriphery::tare_tens()
 {
@@ -2007,7 +2036,7 @@ int StringPeriphery::manage_heat_duty_single(int ind, float temp,float kp)
     float d_temp = temp_dest - temp;
     
 #ifdef MAKET
-    float integr_max = (0.9*temp - 40);// 158 = 13%;  88 = 6%
+    float integr_max = (7.2*temp - 40);// 158 = 13%;  88 = 6%
      integr_part += d_temp * 0.0001;
     #else
 float integr_max = (21.335*temp - 614.76)*1.05;// 

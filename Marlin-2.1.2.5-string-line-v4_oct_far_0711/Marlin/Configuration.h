@@ -95,9 +95,9 @@
 
 //#define MAKET
 
-#define PRIMARY_PLATE
+//#define PRIMARY_PLATE
 
-
+#define STRING_WARNING_TIME 600 //seconds
 //---------------------------------
 /**
  * Select the serial port on the board to use for communication with the host.

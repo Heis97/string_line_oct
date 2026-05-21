@@ -10,6 +10,7 @@ void GcodeSuite::M585() {
 
   #ifndef PRIMARY_PLATE
   //BUNKER CONTROL
+  if (parser.seen('B'))                      {string_manager.motors_free_bunker(parser.intval('B'));};
       //------------------X vibro-----------------------
   if (parser.seen('X'))                      {string_manager.feed_pound_move = parser.intval('X');};
    if (parser.seen('X') && parser.seen('V'))  {motors._vibro[string_manager.feed_pound_axis] = parser.intval('V');}; 
@@ -74,7 +75,17 @@ if (parser.seen('C') && parser.seen('I') && parser.seen('L'))  string_manager.po
 
 if (parser.seen('C') && parser.seen('R'))  string_manager.set_led_micro_e(parser.intval('R'));
 
+#else
+
+if (parser.seen('Z')) {string_manager.recuperator_move = parser.intval('Z'); string_manager.set_pfled(PFLED_RECUP,string_manager.recuperator_move); }
+
+if (parser.seen('F')) 
+{
+  string_manager.set_turbo(parser.floatval('F'));
+} 
 
 
 #endif
+
+
 }
