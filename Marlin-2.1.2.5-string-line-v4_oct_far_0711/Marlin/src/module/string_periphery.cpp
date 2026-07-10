@@ -296,13 +296,13 @@ void StringPeriphery::string_spi_loop()
     if(dtime <=0 ) dtime = 1;
     //Serial.print(dtime);
    // Serial.print(" dtime ");
-
+/*
     for(int i=0; i<SPI_PACKET_LEN;i++)
     {
        Serial.print(rcvbuf[i]);
     }
     Serial.println("->rcvbuf");
-
+*/
     //--------------------------------------------------------------------
 
     bool res_parse_ts = true;
@@ -1356,8 +1356,8 @@ bool StringPeriphery::parse_data_ts_bin(char _data[], float* force, long* string
     memcpy(&len,enc_str,sizeof(len));
     memcpy(&tens,tens_str,sizeof(tens));
     sum_ins = crc_in;
-    /*if(start_ind==1)
-    {
+    //if(start_ind==1)
+    /*{
         Serial.print(" len: " );
         Serial.print(len);
         Serial.print(" tens: " );
@@ -1366,8 +1366,8 @@ bool StringPeriphery::parse_data_ts_bin(char _data[], float* force, long* string
         Serial.print(sum_ins);
         Serial.print(" s_out: " );
         Serial.print(sum_out);
-    }*/
-    //Serial.println(" ");
+    }
+    Serial.println(" ");*/
 
     if(sum_ins==sum_out)
     {
@@ -1378,7 +1378,7 @@ bool StringPeriphery::parse_data_ts_bin(char _data[], float* force, long* string
     else{  
         *force =  -3.0f;
         *string_len =  -2l;
-        
+        Serial.println("sum_ins!=sum_out");
         return false;
     } 
 };
@@ -1571,10 +1571,10 @@ else
 void StringPeriphery::set_reley_1(int v)
 {
     int v_set = v;
-    #ifdef INVERT_RELE
+    //#ifdef INVERT_RELE
     if(v==0) v_set = 1;
     else v_set = 0;
-    #endif
+    //#endif
     WRITE(RELAY_0_PIN,v_set);
     reley_1 = v;
     //Serial.print("rel 1 ");
@@ -1583,10 +1583,10 @@ void StringPeriphery::set_reley_1(int v)
 void StringPeriphery::set_reley_2(int v)
 {
    int v_set = v;
-    #ifdef INVERT_RELE
+    //#ifdef INVERT_RELE
     if(v==0) v_set = 1;
     else v_set = 0;
-    #endif
+    //#endif
     WRITE(RELAY_1_PIN,v_set);
     reley_2 = v;
 
@@ -1673,6 +1673,7 @@ String StringPeriphery::state_cur()
     String(reley_24_out)+delim+//6  */
 
     String state = "";
+    if (cur_send==TENSOMETR_NUM+4){cur_send = 0;};
     if(cur_send<TENSOMETR_NUM)
     {       
         int i = cur_send;
@@ -1736,7 +1737,7 @@ String StringPeriphery::state_cur()
     }
 
     cur_send++;
-    if (cur_send==TENSOMETR_NUM+4){cur_send = 0;};
+    
     return state;
 };
 
@@ -1747,7 +1748,7 @@ String StringPeriphery::state_cur_sup()
     #ifndef PRIMARY_PLATE
     String delim = " ";
 
-
+if (cur_send==4){cur_send = 0;};
     if(cur_send==0)
     {
         state = "st2 "+
@@ -1790,7 +1791,7 @@ String StringPeriphery::state_cur_sup()
     }
     
     cur_send++;
-    if (cur_send==4){cur_send = 0;};
+    
     //Serial.println(state);
     #endif
     return state;

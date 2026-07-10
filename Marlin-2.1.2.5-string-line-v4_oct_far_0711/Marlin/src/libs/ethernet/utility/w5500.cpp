@@ -71,24 +71,44 @@ void W5500Class::init_soft_spi(uint8_t cs_pin)//,uint8_t mosi, uint8_t miso, uin
 uint16_t W5500Class::getTXFreeSize(SOCKET s)
 {
     uint16_t val=0, val1=0;
+
+    uint32_t counter_tx=0;
     do {
         val1 = readSnTX_FSR(s);
         if (val1 != 0)
             val = readSnTX_FSR(s);
+
+        counter_tx++;
     } 
     while (val != val1);
+    if(counter_tx!=1)
+    {
+Serial.print("counter_tx: ");
+    Serial.println(counter_tx);
+    }
+    
     return val;
 }
 
 uint16_t W5500Class::getRXReceivedSize(SOCKET s)
 {
     uint16_t val=0,val1=0;
+     uint32_t counter_rx=0;
     do {
         val1 = readSnRX_RSR(s);
         if (val1 != 0)
             val = readSnRX_RSR(s);
+
+        counter_rx++;
     } 
     while (val != val1);
+if(counter_rx!=1)
+    {
+Serial.print("counter_rx: ");
+    Serial.println(counter_rx);
+    }
+    
+
     return val;
 }
 

@@ -93,9 +93,9 @@
 
 //---------------------------------
 
-//#define MAKET
+#define MAKET
 
-//#define PRIMARY_PLATE
+#define PRIMARY_PLATE
 
 #define STRING_WARNING_TIME 600 //seconds
 //---------------------------------
