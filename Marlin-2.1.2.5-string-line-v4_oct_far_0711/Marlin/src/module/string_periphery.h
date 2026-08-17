@@ -48,7 +48,10 @@
 #define FAN_BOX_PIN FAN5_PIN
 
 #define TURBO_PIN HEATER_3_PIN
-#define PRESS_PIN RELAY_3_PIN
+
+#ifndef MAKET
+#define PRESS_PIN HEATER_3_PIN
+#endif
 
 #ifndef MAKET
 #define LED_POUND FAN2_PIN
@@ -82,7 +85,7 @@ Adafruit_PCF8574 pcf_led2;
 #define TENSOMETR_NUM 5
 #define MED_FILTR_LEN 3
 
-//#define INVERT_RELE
+
 
 MAX6675 max6675_temp_cam_ext = MAX6675(TEMP_0_CS_PIN ,ARD_MOSI_PIN,ARD_MISO_PIN,ARD_SCK_PIN);
 MAX6675 max6675_temp_cam_intern_1 = MAX6675(TEMP_1_CS_PIN ,ARD_MOSI_PIN,ARD_MISO_PIN,ARD_SCK_PIN);

@@ -1529,14 +1529,14 @@ void StringPeriphery::set_press(uint16_t v)
     if(v>0)
     {
         set_pfled(PFLED_PNEVMO,true);
-       // WRITE(PRESS_PIN,1);
+        WRITE(PRESS_PIN,1);
     }
     else
     {
         set_pfled(PFLED_PNEVMO,false);
-        //WRITE(PRESS_PIN,0);
+        WRITE(PRESS_PIN,0);
     }
-#endif
+    #endif
 };
 
 void StringPeriphery::set_turbo(uint16_t v)
@@ -1571,10 +1571,10 @@ else
 void StringPeriphery::set_reley_1(int v)
 {
     int v_set = v;
-    //#ifdef INVERT_RELE
+    #ifdef INVERT_RELE
     if(v==0) v_set = 1;
     else v_set = 0;
-    //#endif
+    #endif
     WRITE(RELAY_0_PIN,v_set);
     reley_1 = v;
     //Serial.print("rel 1 ");
@@ -1583,10 +1583,10 @@ void StringPeriphery::set_reley_1(int v)
 void StringPeriphery::set_reley_2(int v)
 {
    int v_set = v;
-    //#ifdef INVERT_RELE
+    #ifdef INVERT_RELE
     if(v==0) v_set = 1;
     else v_set = 0;
-    //#endif
+    #endif
     WRITE(RELAY_1_PIN,v_set);
     reley_2 = v;
 
@@ -1613,10 +1613,10 @@ void StringPeriphery::set_reley_HV(int v)
 void StringPeriphery::set_reley_press(int v)
 {
    int v_set = v;
-    /*#ifdef INVERT_RELE
+    #ifdef INVERT_RELE
     if(v==0) v_set = 1;
     else v_set = 0;
-    #endif */
+    #endif 
     WRITE(PRESS_PIN,v_set);
     reley_press = v;
 };
@@ -2036,14 +2036,14 @@ int StringPeriphery::manage_heat_duty_single(int ind, float temp,float kp)
     }
     float d_temp = temp_dest - temp;
     
-#ifdef MAKET
+    #ifdef MAKET
     float integr_max = (7.2*temp - 40);// 158 = 13%;  88 = 6%
      integr_part += d_temp * 0.0001;
     #else
-float integr_max = (21.335*temp - 614.76)*1.05;// 
- integr_part += d_temp * 0.0001;
-#endif
-   
+    float integr_max = (21.335*temp - 614.76)*1.05;// 
+    integr_part += d_temp * 0.0001;
+    #endif
+    
     if(integr_part>integr_max) integr_part = integr_max;
 
     duty = kp * d_temp + integr_part;
