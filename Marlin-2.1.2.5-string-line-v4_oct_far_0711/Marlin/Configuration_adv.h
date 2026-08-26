@@ -2739,7 +2739,7 @@
   #ifndef PRIMARY_PLATE
     #define X_CURRENT       500        // (mA) RMS current. Multiply by 1.414 for peak current.
     #else
- #define X_CURRENT       800  
+ #define X_CURRENT       1200  
     #endif
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for homing. (Typically lower than *_CURRENT.)
     #define X_MICROSTEPS     16        // 0..256

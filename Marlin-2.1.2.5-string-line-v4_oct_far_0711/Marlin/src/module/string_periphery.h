@@ -254,6 +254,11 @@ float kp_2 = 140;//
 int cycle_time = 10000;
 int period_manage_mcs = 1000;
 
+int temp_duty_manage = 1;
+
+float temp_koef_k = 1;
+float temp_koef_b = 0;
+
 volatile int gateway_move = 0;
 volatile int recuperator_move = 0;
 volatile int feed_pound_move = 0;

@@ -48,6 +48,28 @@ void GcodeSuite::M579() {
     
   }
 
+  if (parser.seen('A')) 
+  {
+    string_manager.temp_duty_manage = parser.intval('A');
+    
+  }
+
+  if (parser.seen('B')) 
+  {
+    string_manager.temp_koef_b = parser.floatval('B');
+    
+  }
+
+  if (parser.seen('C')) 
+  {
+    string_manager.temp_koef_k = parser.floatval('C');
+    
+  }
+  if (parser.seen('D')) 
+  {
+    string_manager.kp_1 = parser.floatval('D');
+    string_manager.kp_2 = parser.floatval('D');
+  }
   if (parser.seen('N')) 
   {
     string_manager.set_heaters_ind(parser.intval('N'));

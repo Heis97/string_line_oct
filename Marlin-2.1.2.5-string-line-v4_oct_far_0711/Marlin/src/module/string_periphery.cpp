@@ -1728,7 +1728,7 @@ String StringPeriphery::state_cur()
         String(cur_line_num)+ delim+//0
         String(cur_send)+ delim+//1
         String(vel_count_2)+delim+//2 //
-        String((int)(integr_part*10000.0f))+delim+//3 //
+        String((int)(integr_part*10.0f))+delim+//3 //
         String((int)(duty_1))+delim+//4 //
         String((int)(sec_remain))+delim+//5 //sec_remain
         "0"+delim;//6 //
@@ -2040,13 +2040,19 @@ int StringPeriphery::manage_heat_duty_single(int ind, float temp,float kp)
     float integr_max = (7.2*temp - 40);// 158 = 13%;  88 = 6%
      integr_part += d_temp * 0.0001;
     #else
-    float integr_max = (21.335*temp - 614.76)*1.05;// 
+    //float integr_max = (21.335*temp - 614.76)*1.05;// 
+    float integr_max = (temp_koef_k*temp - temp_koef_b)*1.05;// 
     integr_part += d_temp * 0.0001;
     #endif
     
     if(integr_part>integr_max) integr_part = integr_max;
 
     duty = kp * d_temp + integr_part;
+    if(temp_duty_manage!=0)
+    {
+        duty = temp_dest*10;
+    }
+    
     
     if(duty>cycle_time-200) duty = cycle_time-200;
     
