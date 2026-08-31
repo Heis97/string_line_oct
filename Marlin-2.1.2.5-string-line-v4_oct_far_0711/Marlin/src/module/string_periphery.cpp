@@ -1094,11 +1094,11 @@ void StringPeriphery::idle()
 
             if(!vibro_switched && recuperator_move == 1)
             {
-                motors._vibro[vibro_axis] = 1;
+                /*motors._vibro[vibro_axis] = 1;
                 motors.step(200L,vibro_axis);
                 motors.setVel(vibro_vel_valve/2,vibro_axis); 
                 motors.setAcs(vibro_vel_valve/20,vibro_axis);
-                motors.setVelDest(vibro_vel_valve,vibro_axis);  
+                motors.setVelDest(vibro_vel_valve,vibro_axis);  */
                 vibro_switched = true;
             }
            /* if (!valve_switched_p2 && recuperator_move == 1)
@@ -1610,6 +1610,7 @@ void StringPeriphery::set_reley_HV(int v)
     WRITE(RELAY_2_PIN,v_set);
     reley_HV = v;
 };
+
 void StringPeriphery::set_reley_press(int v)
 {
    int v_set = v;
@@ -1659,6 +1660,7 @@ uint8_t release_counter[5] = {0,0,0,0,0};
 float integr_part = 0;
 int cur_send = 0;
 int speed_string_count = 0;
+
 String StringPeriphery::state_cur()
 {
     //long steps = (long)motors.readSteps()[0];
@@ -1776,10 +1778,10 @@ if (cur_send==4){cur_send = 0;};
         state = "st2 "+
         String(cur_line_num)+ delim+//0
         String(cur_send)+ delim+//1
-        String(mirror_h_off_d)+delim+//2 mirror_h_off_d
-        String(camera_h_off_d)+delim+//3 camera_h_off_d
-        String(mirror_h_off_e)+delim+//4 mirror_h_off_e
-        String(camera_h_off_e)+delim+//5 camera_h_off_e
+        String(mirror_cur_d)+delim+//2 mirror_h_off_d
+        String(camera_cur_d)+delim+//3 camera_h_off_d
+        String(mirror_cur_e)+delim+//4 mirror_h_off_e
+        String(camera_cur_e)+delim+//5 camera_h_off_e
         String(led_micr_d)+delim;//6
     }
     else if(cur_send==3)
@@ -2269,10 +2271,32 @@ void StringPeriphery::comp_speeds_string()
 
 void StringPeriphery::move_one_axis(AxisEnum ax, float dist)
 {
+    motors.setVel(0,mirror_axis_d);
+    motors.setVel(0,camera_axis_d);
+    motors.setVel(0,mirror_axis_e);
+    motors.setVel(0,camera_axis_e);
+    
+    motors.setVelDest(microsc_vel,mirror_axis_d);  
+    motors.setVelDest(microsc_vel,camera_axis_d);  
+    motors.setVelDest(microsc_vel,mirror_axis_e);  
+
+    motors.setVelDest(microsc_vel,camera_axis_e);  
+
     motors.gotopos(dist,ax);
 };
 void StringPeriphery::move_two_axis(AxisEnum ax1, float dist1,AxisEnum ax2, float dist2)
 {
+    motors.setVel(0,mirror_axis_d);
+    motors.setVel(0,camera_axis_d);
+    motors.setVel(0,mirror_axis_e);
+    motors.setVel(0,camera_axis_e);
+
+    motors.setVelDest(microsc_vel,mirror_axis_d);  
+    motors.setVelDest(microsc_vel,camera_axis_d);  
+    motors.setVelDest(microsc_vel,mirror_axis_e);  
+
+    motors.setVelDest(microsc_vel,camera_axis_e);  
+
     motors.gotopos(dist1,ax1);
     motors.gotopos(dist2,ax2);
 };

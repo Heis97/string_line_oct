@@ -27,6 +27,7 @@ float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 #endif
 
 #else
+
 #ifdef PRIMARY_PLATE
 //dev 1    {-1,  -1,  -1,  1,  1,  1,  1,  1  };
 //dev 2 
@@ -93,10 +94,10 @@ StepDirDriverPos::StepDirDriverPos (int* pinStep, int* pinDir, int* pinEn, int* 
     #ifndef PRIMARY_PLATE 
     setVelDest(2.1,i);
     setAcs(0.5f,i);
-    if(i>3)
+    if(i>=3)
     {
-       setVelDest(2.1,i);
-       setAcs(0.5f,i);
+       setVelDest(2.5,i);
+       setAcs(0.6f,i);
     }
     #else
     setVelDest(2.1,i);
@@ -184,7 +185,7 @@ void  StepDirDriverPos::control(byte num) {
 
 void  StepDirDriverPos::control() {
   //for (byte i=AXIS_NUM-1; i>0;i--){ control(i); }
-control(7);
+  control(7);
   control(6);
   control(5);
   control(4);
@@ -444,10 +445,6 @@ void  StepDirDriverPos::vel_handler(byte _num)
        return;
       }
     unsigned long  _dt_time_ch_vel = _time_ch_vel-_time_ch_vel_prev[_num];
-    
-    
-    
-
 
     if(_vel[_num]>=_vel_dest[_num])
     {
@@ -514,7 +511,7 @@ _time_ch_vel = micros();
     vel_handler(4);
     vel_handler(5);
     vel_handler(6);
-   // vel_handler(7);
+    vel_handler(7);
 
   #ifdef DEBUG_STEP_DIR
 

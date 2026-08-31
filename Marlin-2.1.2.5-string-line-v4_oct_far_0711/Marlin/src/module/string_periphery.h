@@ -51,7 +51,13 @@
 
 #ifndef MAKET
 #define PRESS_PIN HEATER_3_PIN
+#else
+#define PRESS_PIN RELAY_3_PIN
 #endif
+
+
+
+
 
 #ifndef MAKET
 #define LED_POUND FAN2_PIN
@@ -371,13 +377,13 @@ bool taring_process_all = false;
 
 
 #ifndef PRIMARY_PLATE
-//----------D micro----------------------
+//----------D micro---------before-------------
 
 
 void set_led_micro_d(uint8_t v);
 void set_led_micro_e(uint8_t v);
 
-volatile float microsc_vel = 5.1f;
+volatile float microsc_vel = 2.1f;
 
 
 AxisEnum mirror_axis_d = J_AXIS;
@@ -397,15 +403,15 @@ float offset_mirror_d = 3;//10 maket // 3
 //float pos_mirror_d[3] = {1,2,3};
 //float pos_camera_d[3] = {1,2,3};
 
-float pos_mirror_d[5] = {2,7,15,22,30};
-float pos_camera_d[5] = {-5,2,8,16,23};
+float pos_mirror_d[5] = {2.3,     5.6,     8.9,    22,30};
+float pos_camera_d[5] = {3.7,     7,     10.4,     16,23};
 
-float limit_camera_d = 50;
-float limit_mirror_d = 50;
+float limit_camera_d = 20;//50 prom
+float limit_mirror_d = 20;//50 prom
 
 int led_micr_d = 0;
 
-//----------E micro----------------------
+//----------E micro----------after------------
 AxisEnum mirror_axis_e = U_AXIS;
 AxisEnum camera_axis_e = K_AXIS;
 float mirror_coord_e = 0.0;
@@ -423,11 +429,11 @@ float offset_mirror_e = 3;//10
 //float pos_mirror_e[3] = {1,2,3};
 //float pos_camera_e[3] = {1,2,3};
 
-float pos_mirror_e[5] = {2,7,15,22,30};
-float pos_camera_e[5] = {-5,2,8,16,23};
+float pos_mirror_e[5] = {2.3,     7.4,     14.0,     22,30};//2,7,15
+float pos_camera_e[5] = {0.7,     5.1,     11.7,   16,23};//-5,2,8
 
-float limit_camera_e = 50;
-float limit_mirror_e = 50;
+float limit_camera_e = 20;
+float limit_mirror_e = 20;
 
 int led_micr_e = 0;
 #endif
