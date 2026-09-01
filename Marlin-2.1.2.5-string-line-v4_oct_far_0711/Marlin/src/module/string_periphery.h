@@ -254,16 +254,16 @@ long cur_line_num = 0;
 float kp_1 = 40;//
 float kp_2 = 40;//
 #else
-float kp_1 = 140;//
-float kp_2 = 140;//
+float kp_1 = 70;//
+float kp_2 = 70;//140
 #endif
 int cycle_time = 10000;
-int period_manage_mcs = 1000;
+int period_manage_mcs = 100;
 
-int temp_duty_manage = 1;
+int temp_duty_manage = 0;
 
-float temp_koef_k = 1;
-float temp_koef_b = 0;
+float temp_koef_k = 20.4;
+float temp_koef_b = 624.4;
 
 volatile int gateway_move = 0;
 volatile int recuperator_move = 0;
@@ -279,6 +279,8 @@ volatile double k_enc_abs = 1.0d;
 
 float cur_speed_sec_med = 0.0f;
 
+#define RELAY_0_PIN HEATER_2_PIN
+#define RELAY_1_PIN HEATER_3_PIN
 
 
 volatile float gateway_def_vel = 3.0f;

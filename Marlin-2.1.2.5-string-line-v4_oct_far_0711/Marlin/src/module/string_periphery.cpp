@@ -97,6 +97,7 @@ void StringPeriphery::init()
     pinMode(RELAY_4_PIN,OUTPUT);
     pinMode(RELAY_5_PIN,OUTPUT);
 
+    //WRITE(HEATER_2_PIN, HIGH);
 
     set_24v_out(0);
     set_24v_reset(0);
@@ -959,7 +960,7 @@ bool valve_switched_p2 = false;
 bool vibro_switched = false;
 
 int temp_cycle_counter = 0;
-int temp_cycle_max = 20;
+int temp_cycle_max = 200;
 
 int led_counter = 0;
 
@@ -1050,14 +1051,18 @@ void StringPeriphery::idle()
         temp_cycle_counter++;
         if(temp_cycle_counter>temp_cycle_max)
         {
-            max_test1.readRaw();
+            uint16_t temp_raw = max_test1.readRaw();
+            thermalManager.temp_hotend[0].setraw(temp_raw);
+            
             float chamber_temp_cur = max_test1.temperature();
+            thermalManager.temp_hotend[0].celsius = (float)chamber_temp_cur;
             temp_val_ext = temp_val_ext - 0.007*(temp_val_ext-chamber_temp_cur);
-            temp_cycle_counter  =0;
+            
+            temp_cycle_counter  = 0;
         }
 
         time_measure_temp =  cur_time_mc;
-        manage_heat_duty(temp_val_ext);
+        //manage_heat_duty(temp_val_ext);
         handler_pfled();
 
         //pcf_led1.digitalWrite(0,true);
@@ -2093,6 +2098,16 @@ void StringPeriphery::heat_pwm_control_single(int ind, int counter, int duty)
 void StringPeriphery::set_heaters_enable(int v)
 {
     heater_en = v;
+
+    if(heater_en == 1)
+    {
+        thermalManager.setTargetHotend(temp_dest, 0);
+    }
+    else
+    {
+        thermalManager.setTargetHotend(5, 0);
+    }
+
 };
 void StringPeriphery::set_heaters_temp(float v)
 {

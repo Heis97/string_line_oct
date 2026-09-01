@@ -1,7 +1,12 @@
 #include "../../../inc/MarlinConfig.h"
 #include "../../gcode.h"
 #include "../../../module/planner.h"
+#include "../../../module/temperature.h"
 #include "../../../module/string_periphery.h"
+
+
+//#include "../../../module/motion.h"
+
 
 void GcodeSuite::M579() {
   #ifdef PRIMARY_PLATE
@@ -40,6 +45,8 @@ void GcodeSuite::M579() {
   if (parser.seen('T')) 
   {
       string_manager.set_heaters_temp(parser.floatval('T'));
+
+      
   }
 
   if (parser.seen('E')) 
@@ -64,6 +71,15 @@ void GcodeSuite::M579() {
   {
     string_manager.temp_koef_k = parser.floatval('C');
     
+  }
+
+  if (parser.seen('C') && parser.seen('S')&& parser.seen('E')) 
+  {
+    M303();
+  }
+  if (parser.seen('P') && parser.seen('I')&& parser.seen('D'))
+  {
+    M301();
   }
   if (parser.seen('D')) 
   {

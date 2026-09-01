@@ -36,7 +36,7 @@
 #include "endstops.h"
 #include "planner.h"
 #include "printcounter.h"
-
+#include "string_periphery.h"
 #if ANY(HAS_COOLER, LASER_COOLANT_FLOW_METER)
   #include "../feature/cooler.h"
   #include "../feature/spindle_laser.h"
@@ -726,7 +726,7 @@ volatile bool Temperature::raw_temps_ready = false;
     while (wait_for_heatup) { // Can be interrupted with M108
 
       const millis_t ms = millis();
-
+      string_manager.idle();
       if (updateTemperaturesIfReady()) { // temp sample ready
 
         // Get the current temperature and constrain it
@@ -1562,16 +1562,16 @@ void Temperature::mintemp_error(const heater_id_t heater_id) {
 
   void Temperature::manage_hotends(const millis_t &ms) {
     HOTEND_LOOP() {
-      #if ENABLED(THERMAL_PROTECTION_HOTENDS)
+     /* #if ENABLED(THERMAL_PROTECTION_HOTENDS)
         if (degHotend(e) > temp_range[e].maxtemp) maxtemp_error((heater_id_t)e);
-      #endif
+      #endif*/
 
       TERN_(HEATER_IDLE_HANDLER, heater_idle[e].update(ms));
 
-      #if ENABLED(THERMAL_PROTECTION_HOTENDS)
+      /*#if ENABLED(THERMAL_PROTECTION_HOTENDS)
         // Check for thermal runaway
         tr_state_machine[e].run(temp_hotend[e].celsius, temp_hotend[e].target, (heater_id_t)e, THERMAL_PROTECTION_PERIOD, THERMAL_PROTECTION_HYSTERESIS);
-      #endif
+      #endif*/
 
       temp_hotend[e].soft_pwm_amount = (temp_hotend[e].celsius > temp_range[e].mintemp || is_preheating(e)) && temp_hotend[e].celsius < temp_range[e].maxtemp ? (int)get_pid_output_hotend(e) >> 1 : 0;
 
@@ -1895,8 +1895,8 @@ void Temperature::task() {
   #endif
 */
   if (!updateTemperaturesIfReady()) return; // Will also reset the watchdog if temperatures are ready
-
- /* #if DISABLED(IGNORE_THERMOCOUPLE_ERRORS)
+/*
+  #if DISABLED(IGNORE_THERMOCOUPLE_ERRORS)
     #if TEMP_SENSOR_IS_MAX_TC(0)
       if (degHotend(0) > _MIN(HEATER_0_MAXTEMP, TEMP_SENSOR_0_MAX_TC_TMAX - 1.00f)) maxtemp_error(H_E0);
       if (degHotend(0) < _MAX(HEATER_0_MINTEMP, TEMP_SENSOR_0_MAX_TC_TMIN + 0.01f)) mintemp_error(H_E0);
@@ -1920,13 +1920,13 @@ void Temperature::task() {
   #else
     #warning "Safety Alert! Disable IGNORE_THERMOCOUPLE_ERRORS for the final build!"
   #endif
-
-  const millis_t ms = millis();*/
+*/
+  const millis_t ms = millis();
 
   // Handle Hotend Temp Errors, Heating Watch, etc.
- //TERN_(HAS_HOTEND, manage_hotends(ms));
+ TERN_(HAS_HOTEND, manage_hotends(ms));
 
-  /* #if HAS_TEMP_REDUNDANT
+ /*  #if HAS_TEMP_REDUNDANT
     // Make sure measured temperatures are close together
     if (ABS(degRedundantTarget() - degRedundant()) > TEMP_SENSOR_REDUNDANT_MAX_DIFF)
       _temp_error((heater_id_t)HEATER_ID(TEMP_SENSOR_REDUNDANT_TARGET), F(STR_REDUNDANCY), GET_TEXT_F(MSG_ERR_REDUNDANT_TEMP));
@@ -1956,9 +1956,9 @@ void Temperature::task() {
         cutter.cutter_mode = CUTTER_MODE_ERROR;   // Immediately kill stepper inline power output
       }
     #endif
-  #endif
+  #endif*/
 
-  UNUSED(ms);*/
+  UNUSED(ms);
 }
 
 #define TEMP_AD595(RAW)  ((RAW) * 5.0 * 100.0 / float(HAL_ADC_RANGE) / (OVERSAMPLENR) * (TEMP_SENSOR_AD595_GAIN) + TEMP_SENSOR_AD595_OFFSET)
@@ -2113,7 +2113,6 @@ void Temperature::task() {
       kill();
       return 0;
     }
-
     switch (e) {
       case 0:
         #if TEMP_SENSOR_0_IS_CUSTOM
@@ -2374,7 +2373,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 
   hal.watchdog_refresh(); // Reset because raw_temps_ready was set by the interrupt
 
-  #if TEMP_SENSOR_IS_MAX_TC(0)
+  /*#if TEMP_SENSOR_IS_MAX_TC(0)
     temp_hotend[0].setraw(READ_MAX_TC(0));
   #endif
   #if TEMP_SENSOR_IS_MAX_TC(1)
@@ -2403,7 +2402,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 
   TERN_(FILAMENT_WIDTH_SENSOR, filwidth.update_measured_mm());
   TERN_(HAS_POWER_MONITOR,     power_monitor.capture_values());
-
+*/
   #if HAS_HOTEND
     static constexpr int8_t temp_dir[HOTENDS] = {
       #if TEMP_SENSOR_IS_ANY_MAX_TC(0)
@@ -2431,11 +2430,11 @@ void Temperature::updateTemperaturesFromRawValues() {
       #endif
     };
 
-    HOTEND_LOOP() {
+    /*HOTEND_LOOP() {
       const raw_adc_t r = temp_hotend[e].getraw();
       const bool neg = temp_dir[e] < 0, pos = temp_dir[e] > 0;
       if ((neg && r < temp_range[e].raw_max) || (pos && r > temp_range[e].raw_max))
-        maxtemp_error((heater_id_t)e);
+        maxtemp_error((heater_id_t)e);*/
 
       /**
       // DEBUG PREHEATING TIME
@@ -2444,7 +2443,7 @@ void Temperature::updateTemperaturesFromRawValues() {
       if (test_is_preheating < 31) SERIAL_ECHOLNPGM("Extruder = ", e, " Preheat remaining time = ", test_is_preheating, "s", "\n");
       //*/
 
-      const bool heater_on = temp_hotend[e].target > 0;
+      /*const bool heater_on = temp_hotend[e].target > 0;
       if (heater_on && !is_preheating(e) && ((neg && r > temp_range[e].raw_min) || (pos && r < temp_range[e].raw_min))) {
         if (TERN1(MULTI_MAX_CONSECUTIVE_LOW_TEMP_ERR, ++consecutive_low_temperature_error[e] >= MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED))
           mintemp_error((heater_id_t)e);
@@ -2452,7 +2451,7 @@ void Temperature::updateTemperaturesFromRawValues() {
       else {
         TERN_(MULTI_MAX_CONSECUTIVE_LOW_TEMP_ERR, consecutive_low_temperature_error[e] = 0);
       }
-    }
+    }*/
 
   #endif // HAS_HOTEND
 
@@ -3395,7 +3394,7 @@ void Temperature::disable_all_heaters() {
  * Applies all the accumulators to the current raw temperatures.
  */
 void Temperature::update_raw_temperatures() {
-
+/*
   // TODO: can this be collapsed into a HOTEND_LOOP()?
   #if HAS_TEMP_ADC_0 && !TEMP_SENSOR_IS_MAX_TC(0)
     temp_hotend[0].update();
@@ -3431,6 +3430,7 @@ void Temperature::update_raw_temperatures() {
   TERN_(HAS_JOY_ADC_X, joystick.x.update());
   TERN_(HAS_JOY_ADC_Y, joystick.y.update());
   TERN_(HAS_JOY_ADC_Z, joystick.z.update());
+  */
 }
 
 /**
