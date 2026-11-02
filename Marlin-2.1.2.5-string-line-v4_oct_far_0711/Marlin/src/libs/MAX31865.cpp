@@ -168,7 +168,7 @@ uint8_t MAX31865::readFault() {
 }
 void MAX31865::begin() 
 {
-  return begin(MAX31865_2WIRE,100.0f,430.0f,1.0f);
+  return begin(MAX31865_2WIRE,1000.0f,4300.0f,2.0f);
 }
 /**
  * Clear last fault

@@ -279,8 +279,8 @@ volatile double k_enc_abs = 1.0d;
 
 float cur_speed_sec_med = 0.0f;
 
-#define RELAY_0_PIN HEATER_2_PIN
-#define RELAY_1_PIN HEATER_3_PIN
+//#define RELAY_0_PIN HEATER_2_PIN
+//#define RELAY_1_PIN HEATER_3_PIN
 
 
 volatile float gateway_def_vel = 3.0f;
@@ -341,8 +341,8 @@ byte karet_axis = (byte)X_AXIS;
 byte motor_com_axis =(byte) Y_AXIS;
 byte motors_tens[5] = {(byte)Z_AXIS,(byte)I_AXIS,(byte)J_AXIS,(byte)K_AXIS,(byte)U_AXIS};
 
-byte feed_pound_axis = (byte)X_AXIS;
-byte gateway_axis = (byte)Y_AXIS;
+byte feed_pound_axis = (byte)Y_AXIS;
+byte gateway_axis = (byte)X_AXIS;
 byte recuperator_axis = (byte)Z_AXIS;
 
 byte vibro_axis = (byte)E_AXIS;

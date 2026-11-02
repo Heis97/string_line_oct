@@ -57,5 +57,11 @@
 #define RELAY_5_PIN  PE15
 
 
+#define HEATER_0_PIN  PE10
+#define HEATER_1_PIN  PE12  //PE12 for 2,3    //PE9 
+
+
+
+
 
 

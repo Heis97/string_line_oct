@@ -37,13 +37,13 @@ float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 int motor_dir[AXIS_NUM] {-1,  -1,  -1,  -1,  -1,  -1,  -1,  1 };
 //int steps_pr_mm[AXIS_NUM] { 800, 160, 240,240, 240, 240, 120, 100  };
 
-float steps_pr_mm_orig[AXIS_NUM] { 800, 80, 94,94, 94, 94, 47, 100  };
-float steps_pr_mm[AXIS_NUM] { 800, 80, 94,94, 94, 94, 47, 100  };
+float steps_pr_mm_orig[AXIS_NUM] { 800, 80, 94,94, 94, 94, 94, 100  };
+float steps_pr_mm[AXIS_NUM] { 800, 80, 94,94, 94, 94, 94, 100  };
 float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 #else
 int motor_dir[AXIS_NUM] {1,  1,  1,  -1,  -1,  -1,  -1,  1  };
-float steps_pr_mm_orig[AXIS_NUM] { 800, 800, 800,400, 400, 400, 200, 400 };
-float steps_pr_mm[AXIS_NUM] { 800, 800, 800,400, 400, 400, 200, 400 };
+float steps_pr_mm_orig[AXIS_NUM] { 800, 800, 800,400, 400, 400, 400, 400 };
+float steps_pr_mm[AXIS_NUM] { 800, 800, 800,400, 400, 400, 400, 400 };
 float steps_pr_mm_k[AXIS_NUM] { 1, 1, 1, 1, 1, 1, 1, 1};
 #endif
 

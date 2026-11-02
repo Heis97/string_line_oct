@@ -215,10 +215,12 @@ typedef struct { float p, i, d, c, f; } raw_pidcf_t;
           work_d = 0.0;
         }
 
-        const float max_power_over_i_gain = float(MAX_POW) / Ki - float(MIN_POW);
+        const float max_power_over_i_gain = 0.15* float(MAX_POW) / Ki - float(MIN_POW);
         temp_iState = constrain(temp_iState + pid_error, 0, max_power_over_i_gain);
 
         work_p = Kp * pid_error;
+        if(work_p>200) work_p = 200;
+        
         work_i = Ki * temp_iState;
         work_d = work_d + PID_K2 * (Kd * (temp_dState - current) - work_d);
 
@@ -1122,7 +1124,7 @@ class Temperature {
      * Cooldown, as from the LCD. Disables all heaters and fans.
      */
     static void cooldown() {
-      zero_fan_speeds();
+      //zero_fan_speeds();
       disable_all_heaters();
     }
 
