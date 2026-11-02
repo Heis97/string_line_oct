@@ -2388,7 +2388,7 @@ void Temperature::updateTemperaturesFromRawValues() {
   #if TEMP_SENSOR_IS_MAX_TC(BED)
     temp_bed.setraw(read_max_tc_bed());
   #endif
-
+*/
   #if HAS_HOTEND
     HOTEND_LOOP() temp_hotend[e].celsius = analog_to_celsius_hotend(temp_hotend[e].getraw(), e);
   #endif
@@ -2402,7 +2402,7 @@ void Temperature::updateTemperaturesFromRawValues() {
 
   TERN_(FILAMENT_WIDTH_SENSOR, filwidth.update_measured_mm());
   TERN_(HAS_POWER_MONITOR,     power_monitor.capture_values());
-*/
+
   #if HAS_HOTEND
     static constexpr int8_t temp_dir[HOTENDS] = {
       #if TEMP_SENSOR_IS_ANY_MAX_TC(0)
@@ -2430,28 +2430,28 @@ void Temperature::updateTemperaturesFromRawValues() {
       #endif
     };
 
-    /*HOTEND_LOOP() {
+    HOTEND_LOOP() {
       const raw_adc_t r = temp_hotend[e].getraw();
       const bool neg = temp_dir[e] < 0, pos = temp_dir[e] > 0;
       if ((neg && r < temp_range[e].raw_max) || (pos && r > temp_range[e].raw_max))
-        maxtemp_error((heater_id_t)e);*/
+        maxtemp_error((heater_id_t)e);
 
-      /**
+      
       // DEBUG PREHEATING TIME
-      SERIAL_ECHOLNPGM("\nExtruder = ", e, " Preheat On/Off = ", is_preheating(e));
+      /*SERIAL_ECHOLNPGM("\nExtruder = ", e, " Preheat On/Off = ", is_preheating(e));
       const float test_is_preheating = (preheat_end_ms_hotend[HOTEND_INDEX] - millis()) * 0.001f;
       if (test_is_preheating < 31) SERIAL_ECHOLNPGM("Extruder = ", e, " Preheat remaining time = ", test_is_preheating, "s", "\n");
-      //*/
+      //
 
-      /*const bool heater_on = temp_hotend[e].target > 0;
+      const bool heater_on = temp_hotend[e].target > 0;
       if (heater_on && !is_preheating(e) && ((neg && r > temp_range[e].raw_min) || (pos && r < temp_range[e].raw_min))) {
         if (TERN1(MULTI_MAX_CONSECUTIVE_LOW_TEMP_ERR, ++consecutive_low_temperature_error[e] >= MAX_CONSECUTIVE_LOW_TEMPERATURE_ERROR_ALLOWED))
           mintemp_error((heater_id_t)e);
       }
       else {
         TERN_(MULTI_MAX_CONSECUTIVE_LOW_TEMP_ERR, consecutive_low_temperature_error[e] = 0);
-      }
-    }*/
+      }*/
+    }
 
   #endif // HAS_HOTEND
 
@@ -3394,7 +3394,7 @@ void Temperature::disable_all_heaters() {
  * Applies all the accumulators to the current raw temperatures.
  */
 void Temperature::update_raw_temperatures() {
-/*
+
   // TODO: can this be collapsed into a HOTEND_LOOP()?
   #if HAS_TEMP_ADC_0 && !TEMP_SENSOR_IS_MAX_TC(0)
     temp_hotend[0].update();
@@ -3430,7 +3430,7 @@ void Temperature::update_raw_temperatures() {
   TERN_(HAS_JOY_ADC_X, joystick.x.update());
   TERN_(HAS_JOY_ADC_Y, joystick.y.update());
   TERN_(HAS_JOY_ADC_Z, joystick.z.update());
-  */
+  
 }
 
 /**

@@ -130,7 +130,7 @@ void StringPeriphery::init()
     pcf_led2.pinMode(1,OUTPUT);
 
 
-    max_test1.begin();
+    //max_test1.begin();
 
     DELAY_US(100000);
     set_reley_press(1);
@@ -1051,12 +1051,12 @@ void StringPeriphery::idle()
         temp_cycle_counter++;
         if(temp_cycle_counter>temp_cycle_max)
         {
-            uint16_t temp_raw = max_test1.readRaw();
-            thermalManager.temp_hotend[0].setraw(temp_raw);
+            //uint16_t temp_raw = max_test1.readRaw();
+            //thermalManager.temp_hotend[0].setraw(temp_raw);
             
-            float chamber_temp_cur = max_test1.temperature();
-            thermalManager.temp_hotend[0].celsius = (float)chamber_temp_cur;
-            temp_val_ext = temp_val_ext - 0.007*(temp_val_ext-chamber_temp_cur);
+            //float chamber_temp_cur = max_test1.temperature();
+            //thermalManager.temp_hotend[0].celsius = (float)chamber_temp_cur;
+            //temp_val_ext = temp_val_ext - 0.007*(temp_val_ext-chamber_temp_cur);
             
             temp_cycle_counter  = 0;
         }
@@ -1698,7 +1698,7 @@ String StringPeriphery::state_cur()
         state = "st1 "+
         String(cur_line_num)+ delim+//0
         String(cur_send)+ delim+//1
-        String(temp_val_ext)+delim+//2  temp_val_ext
+        String(thermalManager.temp_hotend[0].celsius)+delim+//2  temp_val_ext
         String(sec_remain)+delim+//3  heater_en
         String(vibro_main)+delim+//4 
         String(release_counter[0])+delim+//5
